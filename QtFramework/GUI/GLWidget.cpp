@@ -18,6 +18,7 @@ namespace cagd
         _show_curve = true;
         _show_1st_deriv = _show_2nd_deriv = false;
         _cyclic_curve = nullptr;
+        _i_control_points = nullptr;
     }
 
     // ----------
@@ -25,6 +26,9 @@ namespace cagd
     // ----------
     GLWidget::~GLWidget() {
         clearParametricCurve();
+        clearCyclicCurve();
+        clearInterpolatedCyclicCurveControlPoints();
+        clearCurveImg();
     }
 
 
@@ -45,6 +49,12 @@ namespace cagd
         if (_cyclic_curve != nullptr) {
             delete _cyclic_curve;
             _cyclic_curve = nullptr;
+        }
+    }
+    void GLWidget::clearInterpolatedCyclicCurveControlPoints() {
+        if (_i_control_points != nullptr) {
+            delete _i_control_points;
+            _i_control_points = nullptr;
         }
     }
 
@@ -104,7 +114,7 @@ namespace cagd
 
             // create and store your geometry in display lists or vertex buffer objects
             // lab02 - parametric curves:
-            set_curve_type(spiral_on_cone::curve_name);
+            set_renderable(spiral_on_cone::curve_name);
         }
         catch (Exception &e)
         {
@@ -195,7 +205,7 @@ namespace cagd
         _curve_img = newCurveImg;
         _curve_name = curve_name;
 
-        parametricCurveType = true;
+        parametricCurveType = GLWidget::Renderable::PARAMETRIC_CURVE;
         updateGL();
     }
 
@@ -209,7 +219,7 @@ namespace cagd
         const GLuint nn = 2 * n + 1;
         // Generate knot vector and control points:
         GLdouble step = TWO_PI / nn;
-        ColumnMatrix<DCoordinate3> dataPointsToInterpolate(nn);
+//        ColumnMatrix<DCoordinate3> dataPointsToInterpolate(nn);
         for (GLuint i = 0; i < nn; ++i)
         {
             GLdouble u = i * step;
@@ -234,9 +244,10 @@ namespace cagd
 
 
     CyclicCurve3 * GLWidget::createInterpolatedCyclicCurve(GLuint n) {
-        std::cerr << "Itt vagyok!\n";
-        CyclicCurve3 * result = new CyclicCurve3(n);
-        if (result == nullptr) {
+//        std::cerr << "Itt vagyok!\n";
+        CyclicCurve3 * cc = new CyclicCurve3(n);
+        CyclicCurve3 * icp = new CyclicCurve3(n);
+        if (cc == nullptr) {
             throw Exception("Couldn't create cyclic curve!");
         }
 
@@ -249,7 +260,7 @@ namespace cagd
         {
             GLdouble u = i * step;
             knotVector[i] = u;
-            DCoordinate3 cp;
+            DCoordinate3 & cp = (*icp)[i];
 
             cp[0] = cos (u);
             cp[1] = sin (u);
@@ -258,24 +269,35 @@ namespace cagd
             dataPointsToInterpolate[i] = cp;
         }
 
-        result->SetDefinitionDomain(0, TWO_PI);
+        cc->SetDefinitionDomain(0, TWO_PI);
 
         // Update data with interpolation:
-        if (!result->UpdateDataForInterpolation(knotVector, dataPointsToInterpolate)) {
-            delete result;
-            throw Exception("Couldn't update data of cyclic curve!");
+        if (!cc->UpdateDataForInterpolation(knotVector, dataPointsToInterpolate)) {
+            delete cc;
+            delete icp;
+            throw Exception("Couldn't update data of interpolated cyclic curve!");
         }
         // Update VBO:
-        if (!result->UpdateVertexBufferObjectsOfData()) {
-            delete result;
-            throw Exception("Couldn't update VBO of cyclic curve!");
+        if (!cc->UpdateVertexBufferObjectsOfData()) {
+            delete cc;
+            delete icp;
+            throw Exception("Couldn't update VBO of interpolated cyclic curve!");
         }
 
-        return result;
+        if (!icp->UpdateVertexBufferObjectsOfData()) {
+            delete cc;
+            delete icp;
+            throw Exception("Couldn't update VBO of interpolated cyclic curve control points!");
+        }
+
+        clearInterpolatedCyclicCurveControlPoints();
+        _i_control_points = icp;
+
+        return cc;
     }
 
     void GLWidget::setCyclicCurve(CyclicCurve3 * newCurve) {
-        std::cerr << "Itt1!\n";
+//        std::cerr << "Itt1!\n";
         GenericCurve3 * newCurveImg = newCurve->GenerateImage(2, 100);
         if (newCurveImg == nullptr) {
             delete newCurve;
@@ -292,7 +314,6 @@ namespace cagd
         _cyclic_curve = newCurve;
         _curve_img = newCurveImg;
 
-        parametricCurveType = false;
         updateGL();
     }
 
@@ -362,12 +383,19 @@ namespace cagd
                 _curve_img->RenderDerivatives(2, GL_LINES);
             }
 
-            if (!parametricCurveType) {
+            if (parametricCurveType != GLWidget::Renderable::PARAMETRIC_CURVE) {
                 glColor3f(1.f, 1.f, .2f);
                 glPointSize(10.f);
                 _cyclic_curve->RenderData(GL_POINTS);
                 glPointSize(1.f);
                 _cyclic_curve->RenderData(GL_LINE_LOOP);
+
+                if (parametricCurveType == GLWidget::Renderable::INTERPOLATED_CYCLIC_CURVE) {
+                    glColor3f(.8f, .7f, .6f);
+                    glPointSize(10.f);
+                    _i_control_points->RenderData(GL_POINTS);
+                    glPointSize(1.f);
+                }
             }
 
         // pops the current matrix stack, replacing the current matrix with the one below it on the stack,
@@ -466,24 +494,28 @@ namespace cagd
     }
 
 
-    void GLWidget::set_curve_type(QString curve_name) {
+    void GLWidget::set_renderable(QString renderable_name) {
         try {
-            std::cout << "Setting to `" << curve_name.toStdString() << "`...\n";
+            std::cout << "Setting to `" << renderable_name.toStdString() << "`...\n";
             // Check if old curve is the same or not
-            if (curve_name == _curve_name) {
+            if (renderable_name == _curve_name) {
                 return;
             }
 
-            if (curve_name == cyclic::curve_name) {
+            if (renderable_name == cyclic::curve_name) {
                 CyclicCurve3 * curve = createCyclicCurve(2);
-                setCyclicCurve(curve);
                 _curve_name = cyclic::curve_name;
-            } else if (curve_name == cyclic_interpolation::curve_name) {
-                CyclicCurve3 * curve = createInterpolatedCyclicCurve(2);
+                parametricCurveType = GLWidget::Renderable::CYCLIC_CURVE;
                 setCyclicCurve(curve);
+            } else if (renderable_name == cyclic_interpolation::curve_name) {
+                CyclicCurve3 * curve = createInterpolatedCyclicCurve(2);
                 _curve_name = cyclic_interpolation::curve_name;
+                parametricCurveType = GLWidget::Renderable::INTERPOLATED_CYCLIC_CURVE;
+                setCyclicCurve(curve);
+            } else if (renderable_name == mouse::mesh_name) {
+//                setMouseMesh();
             } else {
-                setParametricCurve(curve_name);
+                setParametricCurve(renderable_name);
             }
         } catch (Exception ex) {
             std::cerr << "Failed to create parametric or cyclic curve from selection!\n";

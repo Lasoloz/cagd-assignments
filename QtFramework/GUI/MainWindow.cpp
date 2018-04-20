@@ -50,7 +50,7 @@ namespace cagd
         connect(_side_widget->trans_z_spin_box, SIGNAL(valueChanged(double)), _gl_widget, SLOT(set_trans_z(double)));
 
         // Curve signals:
-        connect(_side_widget->curve_selector, SIGNAL(activated(QString)), _gl_widget, SLOT(set_curve_type(QString)));
+        connect(_side_widget->renderable_selector, SIGNAL(activated(QString)), _gl_widget, SLOT(set_renderable(QString)));
         connect(_side_widget->cb_curve, SIGNAL(toggled(bool)), _gl_widget, SLOT(set_show_curve(bool)));
         connect(_side_widget->cb_1st_deriv, SIGNAL(toggled(bool)), _gl_widget, SLOT(set_show_1st_deriv(bool)));
         connect(_side_widget->cb_2nd_deriv, SIGNAL(toggled(bool)), _gl_widget, SLOT(set_show_2nd_deriv(bool)));

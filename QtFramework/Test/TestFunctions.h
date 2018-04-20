@@ -5,8 +5,16 @@
 
 namespace cagd
 {
+    enum class RendereableType {
+        PARAMETRIC_CURVE,
+        CYCLIC_CURVE,
+        MESH_MOUSE,
+        MESH_ELEPHANT
+    };
+
     namespace spiral_on_cone
     {
+        extern RendereableType type;
         extern QString curve_name;
         extern GLdouble u_min, u_max;
         extern int div;
@@ -18,6 +26,7 @@ namespace cagd
 
     namespace cochleoid
     {
+        extern RendereableType type;
         extern QString curve_name;
         extern GLdouble u_min, u_max;
         extern int div;
@@ -28,6 +37,7 @@ namespace cagd
     }
 
     namespace epicycloid {
+        extern RendereableType type;
         extern QString curve_name;
         extern GLdouble u_min, u_max;
         extern int div;
@@ -40,6 +50,7 @@ namespace cagd
     }
 
     namespace viviani {
+        extern RendereableType type;
         extern QString curve_name;
         extern GLdouble u_min, u_max;
         extern int div;
@@ -51,6 +62,7 @@ namespace cagd
     }
 
     namespace loxodrome {
+        extern RendereableType type;
         extern QString curve_name;
         extern GLdouble u_min, u_max;
         extern int div;
@@ -62,6 +74,7 @@ namespace cagd
     }
 
     namespace fermat {
+        extern RendereableType type;
         extern QString curve_name;
         extern GLdouble u_min, u_max;
         extern int div;
@@ -75,10 +88,18 @@ namespace cagd
 
 
     namespace cyclic {
+        extern RendereableType type;
         extern QString curve_name;
     }
 
     namespace cyclic_interpolation {
+        extern RendereableType type;
         extern QString curve_name;
+    }
+
+
+    namespace mouse {
+        extern RendereableType type;
+        extern QString mesh_name;
     }
 }

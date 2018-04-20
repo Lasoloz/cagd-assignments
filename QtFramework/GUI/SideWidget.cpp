@@ -20,14 +20,15 @@ namespace cagd
 
         rotate_y_slider->setPalette(p);
 
-        curve_selector->addItem(spiral_on_cone::curve_name);
-        curve_selector->addItem(cochleoid::curve_name);
-        curve_selector->addItem(epicycloid::curve_name);
-        curve_selector->addItem(viviani::curve_name);
-        curve_selector->addItem(loxodrome::curve_name);
-        curve_selector->addItem(fermat::curve_name);
-        curve_selector->addItem(cyclic::curve_name);
-        curve_selector->addItem(cyclic_interpolation::curve_name);
+        renderable_selector->addItem(spiral_on_cone::curve_name);
+        renderable_selector->addItem(cochleoid::curve_name);
+        renderable_selector->addItem(epicycloid::curve_name);
+        renderable_selector->addItem(viviani::curve_name);
+        renderable_selector->addItem(loxodrome::curve_name);
+        renderable_selector->addItem(fermat::curve_name);
+        renderable_selector->addItem(cyclic::curve_name);
+        renderable_selector->addItem(cyclic_interpolation::curve_name);
+        renderable_selector->addItem(mouse::mesh_name);
 
         cb_curve->setChecked(true);
     }

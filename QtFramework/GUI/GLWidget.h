@@ -19,6 +19,14 @@ namespace cagd
     {
         Q_OBJECT
 
+    public:
+        enum class Renderable {
+            PARAMETRIC_CURVE,
+            CYCLIC_CURVE,
+            INTERPOLATED_CYCLIC_CURVE,
+            MOUSE_MODEL
+        };
+
     private:
 
         // variables defining the projection matrix
@@ -39,7 +47,7 @@ namespace cagd
         GenericCurve3 * _curve_img;
         void clearCurveImg();
 
-        bool parametricCurveType;
+        Renderable parametricCurveType;
 
         // your other declarations
         ParametricCurve3 * _parametric_curve;
@@ -54,9 +62,11 @@ namespace cagd
 
         // Cyclic curve:
         CyclicCurve3 * _cyclic_curve;
+        CyclicCurve3 * _i_control_points;
         CyclicCurve3 * createCyclicCurve(uint n);
         CyclicCurve3 * createInterpolatedCyclicCurve(uint n);
         void clearCyclicCurve();
+        void clearInterpolatedCyclicCurveControlPoints();
         void setCyclicCurve(CyclicCurve3 * newCurve);
 
     public:
@@ -83,7 +93,7 @@ namespace cagd
         void set_trans_z(double value);
 
         // Choose curve type:
-        void set_curve_type(QString curve_name);
+        void set_renderable(QString curve_name);
         void set_show_curve(bool state);
         void set_show_1st_deriv(bool state);
         void set_show_2nd_deriv(bool state);

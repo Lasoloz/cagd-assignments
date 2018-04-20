@@ -59,7 +59,14 @@ HEADERS += \
     Core/Constants.h \
     Parametric/ParametricCurves3.h \
     Test/TestFunctions.h \
-    Cyclic/CyclicCurves3.h
+    Cyclic/CyclicCurves3.h \
+    Core/TriangulatedMeshes3.h \
+    Core/TriangularFaces.h \
+    Core/TCoordinates4.h \
+    Core/Materials.h \
+    Core/Lights.h \
+    Core/HCoordinates3.h \
+    Core/Colors4.h
 
 SOURCES += \
     GUI/GLWidget.cpp \
@@ -71,6 +78,9 @@ SOURCES += \
     Core/GenericCurves3.cpp \
     Parametric/ParametricCurves3.cpp \
     Test/TestFunctions.cpp \
-    Cyclic/CyclicCurves3.cpp
+    Cyclic/CyclicCurves3.cpp \
+    Core/TriangulatedMeshes3.cpp \
+    Core/Materials.cpp \
+    Core/Lights.cpp
 
 #CONFIG += console

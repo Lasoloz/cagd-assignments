@@ -5,8 +5,10 @@
 using namespace cagd;
 using namespace std;
 
+
 // Spiral on cone:
 // ===============
+RendereableType spiral_on_cone::type = RendereableType::PARAMETRIC_CURVE;
 QString spiral_on_cone::curve_name = "Spiral on cone";
 GLdouble spiral_on_cone::u_min = -TWO_PI;
 GLdouble spiral_on_cone::u_max = +TWO_PI;
@@ -33,6 +35,7 @@ DCoordinate3 spiral_on_cone::d2(GLdouble u)
 
 // Cochleoid:
 // ==========
+RendereableType cochleoid::type = RendereableType::PARAMETRIC_CURVE;
 QString cochleoid::curve_name = "Cochleoid";
 GLdouble cochleoid::u_min = -10;
 GLdouble cochleoid::u_max = 10;
@@ -62,6 +65,7 @@ DCoordinate3 cochleoid::d2(GLdouble u) {
 
 // Epicycloid
 // ==========
+RendereableType epicycloid::type = RendereableType::PARAMETRIC_CURVE;
 QString epicycloid::curve_name = "Epicycloid";
 GLdouble epicycloid::u_min = 0;
 GLdouble epicycloid::u_max = TWO_PI;
@@ -92,6 +96,7 @@ DCoordinate3 epicycloid::d2(GLdouble u) {
 
 
 // Viviani's curve:
+RendereableType viviani::type = RendereableType::PARAMETRIC_CURVE;
 QString viviani::curve_name = "Viviani's curve";
 GLdouble viviani::u_min = -TWO_PI;
 GLdouble viviani::u_max = TWO_PI;
@@ -124,6 +129,7 @@ DCoordinate3 viviani::d2(GLdouble u) {
 
 
 // Loxodrome:
+RendereableType loxodrome::type = RendereableType::PARAMETRIC_CURVE;
 QString loxodrome::curve_name = "Loxodrome";
 GLdouble loxodrome::u_min = -10*TWO_PI;
 GLdouble loxodrome::u_max = 10*TWO_PI;
@@ -173,6 +179,7 @@ DCoordinate3 loxodrome::d2(GLdouble u) {
 
 
 // Fermat spiral:
+RendereableType fermat::type = RendereableType::PARAMETRIC_CURVE;
 QString fermat::curve_name = "Fermat's spiral";
 GLdouble fermat::u_min = -20;
 GLdouble fermat::u_max =  20;
@@ -219,5 +226,23 @@ DCoordinate3 fermat::d2(GLdouble u) {
 
 
 // Cyclic curve:
+RendereableType cyclic::type = RendereableType::CYCLIC_CURVE;
 QString cyclic::curve_name = "Cyclic curve";
+RendereableType cyclic_interpolation::type = RendereableType::CYCLIC_CURVE;
 QString cyclic_interpolation::curve_name = "Cyclic curve with interpolation";
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 3D meshes:
+RendereableType mouse::type = RendereableType::MESH_MOUSE;
+QString mouse::mesh_name = "Mouse model";
