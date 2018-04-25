@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <iostream>
 #include <vector>
+#include "Exceptions.h"
 
 namespace cagd
 {
@@ -23,10 +24,10 @@ namespace cagd
 //        TriangularFace& operator =(const TriangularFace& rhs);
 
         // homework: get node identifiers by value
-        GLuint operator [](GLuint i) const;
+        inline GLuint operator [](GLuint i) const;
 
         // homework: get node identifiers by reference
-        GLuint& operator [](GLuint i);
+        inline GLuint& operator [](GLuint i);
     };
 
     // default constructor
@@ -59,6 +60,11 @@ namespace cagd
 
     // homework
     inline std::istream& operator >>(std::istream& lhs, TriangularFace& rhs) {
+        unsigned vcount;
+        lhs >> vcount;
+        if (vcount != 3) {
+              throw Exception("Just triangulated meshes, please!");
+        }
         lhs >> rhs[0] >> rhs[1] >> rhs[2];
         return lhs;
     }

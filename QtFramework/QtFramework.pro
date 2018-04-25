@@ -66,7 +66,8 @@ HEADERS += \
     Core/Materials.h \
     Core/Lights.h \
     Core/HCoordinates3.h \
-    Core/Colors4.h
+    Core/Colors4.h \
+    Parametric/ParametricSurfaces3.h
 
 SOURCES += \
     GUI/GLWidget.cpp \
@@ -81,6 +82,7 @@ SOURCES += \
     Cyclic/CyclicCurves3.cpp \
     Core/TriangulatedMeshes3.cpp \
     Core/Materials.cpp \
-    Core/Lights.cpp
+    Core/Lights.cpp \
+    Parametric/ParametricSurfaces3.cpp
 
 #CONFIG += console

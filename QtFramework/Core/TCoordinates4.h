@@ -15,24 +15,24 @@ namespace cagd
 
     public:
         // default constructor
-        TCoordinate4();
+        inline TCoordinate4();
 
         // homework: special constructor
-        TCoordinate4(GLfloat s, GLfloat t, GLfloat r = 0.0, GLfloat q = 1.0);
+        inline TCoordinate4(GLfloat s, GLfloat t, GLfloat r = 0.0, GLfloat q = 1.0);
 
         // homework: get components by value
-        GLfloat operator[](GLuint rhs) const;
-        GLfloat s() const;
-        GLfloat t() const;
-        GLfloat r() const;
-        GLfloat q() const;
+        inline GLfloat operator[](GLuint rhs) const;
+        inline GLfloat s() const;
+        inline GLfloat t() const;
+        inline GLfloat r() const;
+        inline GLfloat q() const;
 
         // homework: get components by reference
-        GLfloat& operator[](GLuint rhs);
-        GLfloat& s();
-        GLfloat& t();
-        GLfloat& r();
-        GLfloat& q();
+        inline GLfloat& operator[](GLuint rhs);
+        inline GLfloat& s();
+        inline GLfloat& t();
+        inline GLfloat& r();
+        inline GLfloat& q();
     };
 
     // default constructor

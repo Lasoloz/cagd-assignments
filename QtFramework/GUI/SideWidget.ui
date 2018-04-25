@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>289</width>
-    <height>364</height>
+    <height>387</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -31,7 +31,7 @@
      <x>10</x>
      <y>0</y>
      <width>271</width>
-     <height>361</height>
+     <height>231</height>
     </rect>
    </property>
    <property name="title">
@@ -43,7 +43,7 @@
       <x>3</x>
       <y>21</y>
       <width>269</width>
-      <height>331</height>
+      <height>201</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout">
@@ -217,36 +217,50 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
-      <widget class="QComboBox" name="renderable_selector"/>
-     </item>
-     <item row="7" column="0">
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>230</y>
+     <width>271</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Meshes</string>
+   </property>
+   <widget class="QWidget" name="formLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>271</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="formLayout_2">
+     <item row="0" column="0">
       <widget class="QLabel" name="label_8">
        <property name="text">
-        <string>Select curve type</string>
+        <string>Selected mesh</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
-      <widget class="QCheckBox" name="cb_curve">
+     <item row="0" column="1">
+      <widget class="QComboBox" name="mesh_selector"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_9">
        <property name="text">
-        <string>Show curve</string>
+        <string>Parametric surface</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="0">
-      <widget class="QCheckBox" name="cb_1st_deriv">
-       <property name="text">
-        <string>Show 1st derivative</string>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="0">
-      <widget class="QCheckBox" name="cb_2nd_deriv">
-       <property name="text">
-        <string>Show 2nd derivative</string>
-       </property>
-      </widget>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="parametric_selector"/>
      </item>
     </layout>
    </widget>

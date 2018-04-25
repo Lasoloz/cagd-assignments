@@ -3,99 +3,77 @@
 #include <iostream>
 
 #include <GL/glew.h>
-#include <QGLWidget>
 #include <QGLFormat>
+#include <QGLWidget>
 #include <QString>
 
-#include "Core/GenericCurves3.h"
 #include "Core/Constants.h"
-#include "Parametric/ParametricCurves3.h"
-#include "Cyclic/CyclicCurves3.h"
+#include "Core/Materials.h"
+#include "Core/TriangulatedMeshes3.h"
+#include "Parametric/ParametricSurfaces3.h"
 #include "Test/TestFunctions.h"
 
-namespace cagd
+namespace cagd {
+class GLWidget : public QGLWidget
 {
-    class GLWidget: public QGLWidget
-    {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        enum class Renderable {
-            PARAMETRIC_CURVE,
-            CYCLIC_CURVE,
-            INTERPOLATED_CYCLIC_CURVE,
-            MOUSE_MODEL
-        };
+private:
+    // variables defining the projection matrix
+    float _aspect;         // aspect ratio of the rendering window
+    float _fovy;           // field of view in direction y
+    float _z_near, _z_far; // distance of near and far clipping planes
 
-    private:
+    // variables defining the model-view matrix
+    float _eye[3], _center[3], _up[3];
 
-        // variables defining the projection matrix
-        float       _aspect;            // aspect ratio of the rendering window
-        float       _fovy;              // field of view in direction y
-        float       _z_near, _z_far;    // distance of near and far clipping planes
-
-        // variables defining the model-view matrix
-        float       _eye[3], _center[3], _up[3];
-
-        // variables needed by transformations
-        int         _angle_x, _angle_y, _angle_z;
-        double      _zoom;
-        double      _trans_x, _trans_y, _trans_z;
+    // variables needed by transformations
+    int    _angle_x, _angle_y, _angle_z;
+    double _zoom;
+    double _trans_x, _trans_y, _trans_z;
 
 
-        // Generic curve image:
-        GenericCurve3 * _curve_img;
-        void clearCurveImg();
+    // your other declarations
+    TriangulatedMesh3 *_current_mesh;
+    QString            _current_mesh_name;
 
-        Renderable parametricCurveType;
+    ParametricSurface3 *_parametric_surface;
+    QString             _parametric_surface_name;
 
-        // your other declarations
-        ParametricCurve3 * _parametric_curve;
-        QString _curve_name;
-        bool _show_curve;
-        bool _show_1st_deriv;
-        bool _show_2nd_deriv;
+    bool _is_mesh;
 
+    void _free_mesh();
+    void _free_surface();
+    void _set_current_mesh(QString &mesh_name);
+    void _set_current_parametric(QString &surface_name);
 
-        void clearParametricCurve();
-        void setParametricCurve(QString &curve_name);
+public:
+    // special and default constructor
+    // the format specifies the properties of the rendering window
+    GLWidget(QWidget *parent = 0, const QGLFormat &format = QGL::Rgba |
+                                                            QGL::DepthBuffer |
+                                                            QGL::DoubleBuffer);
+    ~GLWidget();
 
-        // Cyclic curve:
-        CyclicCurve3 * _cyclic_curve;
-        CyclicCurve3 * _i_control_points;
-        CyclicCurve3 * createCyclicCurve(uint n);
-        CyclicCurve3 * createInterpolatedCyclicCurve(uint n);
-        void clearCyclicCurve();
-        void clearInterpolatedCyclicCurveControlPoints();
-        void setCyclicCurve(CyclicCurve3 * newCurve);
+    // redeclared virtual functions
+    void initializeGL();
+    void paintGL();
+    void resizeGL(int w, int h);
 
-    public:
-        // special and default constructor
-        // the format specifies the properties of the rendering window
-        GLWidget(QWidget* parent = 0, const QGLFormat& format = QGL::Rgba | QGL::DepthBuffer | QGL::DoubleBuffer);
-        ~GLWidget();
+public slots:
+    // public event handling methods/slots
+    void set_angle_x(int value);
+    void set_angle_y(int value);
+    void set_angle_z(int value);
 
-        // redeclared virtual functions
-        void initializeGL();
-        void paintGL();
-        void resizeGL(int w, int h);
+    void set_zoom_factor(double value);
 
-    public slots:
-        // public event handling methods/slots
-        void set_angle_x(int value);
-        void set_angle_y(int value);
-        void set_angle_z(int value);
+    void set_trans_x(double value);
+    void set_trans_y(double value);
+    void set_trans_z(double value);
 
-        void set_zoom_factor(double value);
-
-        void set_trans_x(double value);
-        void set_trans_y(double value);
-        void set_trans_z(double value);
-
-        // Choose curve type:
-        void set_renderable(QString curve_name);
-        void set_show_curve(bool state);
-        void set_show_1st_deriv(bool state);
-        void set_show_2nd_deriv(bool state);
-    };
-}
+    // Defined by me:
+    void set_mesh(QString mesh_name);
+    void set_parametric(QString surface_name);
+};
+} // namespace cagd

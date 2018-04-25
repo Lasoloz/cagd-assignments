@@ -1,0 +1,22 @@
+{
+    BasedOnStyle: LLVM,
+    IndentWidth: 4,
+    TabWidth: 4,
+    BreakBeforeBraces: Mozilla,
+    AccessModifierOffset: -4,
+    AlignConsecutiveAssignments: "true",
+    AlignConsecutiveDeclarations: "true",
+    AlignOperands: "true",
+    ColumnLimit: 80,
+
+    MaxEmptyLinesToKeep: 3,
+
+    FixNamespaceComments: "true",
+    AlwaysBreakTemplateDeclarations: "true",
+    BreakConstructorInitializers: BeforeComma,
+    CompactNamespaces: "true",
+
+    AllowShortFunctionsOnASingleLine: "true",
+    AllowShortIfStatementsOnASingleLine: "false",
+    IndentCaseLabels: "false"
+}
