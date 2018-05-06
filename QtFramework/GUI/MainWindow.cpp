@@ -56,12 +56,6 @@ MainWindow::MainWindow(QWidget *parent)
             _gl_widget, SLOT(set_trans_y(double)));
     connect(_side_widget->trans_z_spin_box, SIGNAL(valueChanged(double)),
             _gl_widget, SLOT(set_trans_z(double)));
-
-
-    connect(_side_widget->mesh_selector, SIGNAL(activated(QString)), _gl_widget,
-            SLOT(set_mesh(QString)));
-    connect(_side_widget->parametric_selector, SIGNAL(activated(QString)),
-            _gl_widget, SLOT(set_parametric(QString)));
 }
 
 //--------------------------------

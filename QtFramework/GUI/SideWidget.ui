@@ -230,7 +230,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Meshes</string>
+    <string>Marker</string>
    </property>
    <widget class="QWidget" name="formLayoutWidget">
     <property name="geometry">
@@ -241,28 +241,7 @@
       <height>131</height>
      </rect>
     </property>
-    <layout class="QFormLayout" name="formLayout_2">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>Selected mesh</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QComboBox" name="mesh_selector"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_9">
-       <property name="text">
-        <string>Parametric surface</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="parametric_selector"/>
-     </item>
-    </layout>
+    <layout class="QFormLayout" name="formLayout_2"/>
    </widget>
   </widget>
  </widget>

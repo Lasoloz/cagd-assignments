@@ -34,18 +34,6 @@ private:
 
 
     // your other declarations
-    TriangulatedMesh3 *_current_mesh;
-    QString            _current_mesh_name;
-
-    ParametricSurface3 *_parametric_surface;
-    QString             _parametric_surface_name;
-
-    bool _is_mesh;
-
-    void _free_mesh();
-    void _free_surface();
-    void _set_current_mesh(QString &mesh_name);
-    void _set_current_parametric(QString &surface_name);
 
 public:
     // special and default constructor
@@ -73,7 +61,5 @@ public slots:
     void set_trans_z(double value);
 
     // Defined by me:
-    void set_mesh(QString mesh_name);
-    void set_parametric(QString surface_name);
 };
 } // namespace cagd
