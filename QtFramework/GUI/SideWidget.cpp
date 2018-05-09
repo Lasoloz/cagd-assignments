@@ -23,5 +23,7 @@ SideWidget::SideWidget(QWidget *parent)
 
 
     // Other stuff:
+    original_surface->setChecked(true);
+    interpolated_surface->setChecked(true);
 }
 } // namespace cagd

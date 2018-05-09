@@ -56,10 +56,17 @@ MainWindow::MainWindow(QWidget *parent)
             _gl_widget, SLOT(set_trans_y(double)));
     connect(_side_widget->trans_z_spin_box, SIGNAL(valueChanged(double)),
             _gl_widget, SLOT(set_trans_z(double)));
+
+
+    connect(_side_widget->original_surface, SIGNAL(toggled(bool)), _gl_widget,
+            SLOT(set_show_original_state(bool)));
+    connect(_side_widget->interpolated_surface, SIGNAL(toggled(bool)),
+            _gl_widget, SLOT(set_show_interpolated_state(bool)));
 }
 
 //--------------------------------
 // implementation of private slots
 //--------------------------------
 void MainWindow::on_action_Quit_triggered() { qApp->exit(0); }
+
 } // namespace cagd

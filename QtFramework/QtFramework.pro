@@ -67,7 +67,10 @@ HEADERS += \
     Core/Lights.h \
     Core/HCoordinates3.h \
     Core/Colors4.h \
-    Parametric/ParametricSurfaces3.h
+    Parametric/ParametricSurfaces3.h \
+    Core/TensorProductSurfaces3.h \
+    Core/ShaderPrograms.h \
+    Hyperbolic/SecondOrderHyperbolicPatch.h
 
 SOURCES += \
     GUI/GLWidget.cpp \
@@ -83,6 +86,9 @@ SOURCES += \
     Core/TriangulatedMeshes3.cpp \
     Core/Materials.cpp \
     Core/Lights.cpp \
-    Parametric/ParametricSurfaces3.cpp
+    Parametric/ParametricSurfaces3.cpp \
+    Core/TensorProductSurfaces3.cpp \
+    Core/ShaderPrograms.cpp \
+    Hyperbolic/SecondOrderHyperbolicPatch.cpp
 
 #CONFIG += console

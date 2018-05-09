@@ -241,7 +241,22 @@
       <height>131</height>
      </rect>
     </property>
-    <layout class="QFormLayout" name="formLayout_2"/>
+    <layout class="QFormLayout" name="formLayout_2">
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="interpolated_surface">
+       <property name="text">
+        <string>Show interpolated surface</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="original_surface">
+       <property name="text">
+        <string>Show original surface</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>

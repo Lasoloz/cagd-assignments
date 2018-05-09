@@ -9,9 +9,9 @@
 
 #include "Core/Constants.h"
 #include "Core/Materials.h"
+#include "Core/ShaderPrograms.h"
 #include "Core/TriangulatedMeshes3.h"
-#include "Parametric/ParametricSurfaces3.h"
-#include "Test/TestFunctions.h"
+#include "Hyperbolic/SecondOrderHyperbolicPatch.h"
 
 namespace cagd {
 class GLWidget : public QGLWidget
@@ -34,6 +34,18 @@ private:
 
 
     // your other declarations
+    TriangulatedMesh3 *        surface;
+    TriangulatedMesh3 *        interpolatedSurface;
+    SecondOrderHyperbolicPatch patch;
+    SecondOrderHyperbolicPatch interpolatedPatch;
+    ShaderProgram              shaderProgram;
+    Material                   transparentEmerald;
+
+    RowMatrix<GenericCurve3 *> *u_isoparam_curves;
+    RowMatrix<GenericCurve3 *> *v_isoparam_curves;
+
+    bool _show_original;
+    bool _show_interpolated;
 
 public:
     // special and default constructor
@@ -61,5 +73,7 @@ public slots:
     void set_trans_z(double value);
 
     // Defined by me:
+    void set_show_original_state(bool state);
+    void set_show_interpolated_state(bool state);
 };
 } // namespace cagd

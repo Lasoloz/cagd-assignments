@@ -12,12 +12,46 @@ namespace cagd {
 //--------------------------------
 GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     : QGLWidget(format, parent)
-{}
+    , patch(1)
+    , interpolatedPatch(1)
+    , u_isoparam_curves(nullptr)
+    , v_isoparam_curves(nullptr)
+    , _show_original(true)
+    , _show_interpolated(true)
+{
+    surface             = nullptr;
+    interpolatedSurface = nullptr;
+}
 
 // ----------
 // Destructor
 // ----------
-GLWidget::~GLWidget() {}
+GLWidget::~GLWidget()
+{
+    if (surface) {
+        delete surface;
+    }
+
+    if (interpolatedSurface) {
+        delete interpolatedSurface;
+    }
+
+    if (u_isoparam_curves) {
+        for (GLuint i = 0; i < u_isoparam_curves->GetColumnCount(); ++i) {
+            delete (*u_isoparam_curves)(i);
+        }
+
+        delete u_isoparam_curves;
+    }
+
+    if (v_isoparam_curves) {
+        for (GLuint i = 0; i < v_isoparam_curves->GetColumnCount(); ++i) {
+            delete (*v_isoparam_curves)(i);
+        }
+
+        delete v_isoparam_curves;
+    }
+}
 
 
 //--------------------------------------------------------------------------------------
@@ -74,6 +108,93 @@ void GLWidget::initializeGL()
                 "Your graphics card is not compatible with OpenGL 2.0+! "
                 "Try to update your driver or buy a new graphics adapter!");
         }
+
+
+        //        SecondOrderHyperbolicPatch patch(1);
+        Matrix<DCoordinate3> data_points_to_interpolate =
+            Matrix<DCoordinate3>(4, 4);
+        RowMatrix<GLdouble>    u_knots = RowMatrix<GLdouble>(4);
+        ColumnMatrix<GLdouble> v_knots = ColumnMatrix<GLdouble>(4);
+        for (GLuint i = 0; i < 4; ++i) {
+            u_knots(i) = v_knots(i) = (GLdouble)i / 3.0;
+            for (GLuint j = 0; j < 4; ++j) {
+                GLdouble     r = (GLdouble)i + 1.0;
+                GLdouble     p = (GLdouble)j / 3.0 * PI;
+                DCoordinate3 current =
+                    DCoordinate3(r * cos(p), r * sin(p), sin(i + j * j * i));
+                //                    DCoordinate3(i - 1.5, j - 1.5, cos(i - j *
+                //                    i * i));
+                patch.SetData(i, j, current);
+
+                data_points_to_interpolate(i, j) = current;
+            }
+        }
+
+        if (!interpolatedPatch.UpdateDataForInterpolation(
+                u_knots, v_knots, data_points_to_interpolate)) {
+            throw Exception("Failed to interpolate control net!");
+        }
+
+        if (!interpolatedPatch.UpdateVertexBufferObjectsOfData()) {
+            throw Exception(
+                "Failed to generate interpolated surface's control net's VBO!");
+        }
+
+        if (!patch.UpdateVertexBufferObjectsOfData()) {
+            throw Exception("Failed to generate surface's control net's VBO");
+        }
+
+        surface             = patch.GenerateImage(100, 100);
+        interpolatedSurface = interpolatedPatch.GenerateImage(100, 100);
+
+        if (!surface) {
+            throw Exception("Failed to generate surface's image");
+        }
+
+        if (!interpolatedSurface) {
+            throw Exception("Failed to generate interpolated surface's image");
+        }
+
+        if (!surface->UpdateVertexBufferObjects()) {
+            throw Exception("Failed to initialize surface's image's VBO!");
+        }
+
+        if (!interpolatedSurface->UpdateVertexBufferObjects()) {
+            throw Exception(
+                "Failed to initialize intepolated surface's image's VBO");
+        }
+
+        if (!shaderProgram.InstallShaders("Shaders/two_sided_lighting.vert",
+                                          "Shaders/two_sided_lighting.frag",
+                                          true)) {
+            throw Exception("Failed to install shader program!");
+        }
+
+
+        // Isoparametric curves:
+        u_isoparam_curves = patch.GenerateUIsoparametricLines(4, 1, 100);
+        if (!u_isoparam_curves) {
+            throw Exception("Failed to create U-isoparametric lines");
+        }
+
+        for (GLuint i = 0; i < u_isoparam_curves->GetColumnCount(); ++i) {
+            if (!(*u_isoparam_curves)(i)->UpdateVertexBufferObjects()) {
+                throw Exception("Failed to update VBO for isoparam. line");
+            }
+        }
+        v_isoparam_curves = patch.GenerateVIsoparametricLines(4, 1, 100);
+        if (!v_isoparam_curves) {
+            throw Exception("Failed to create V-isoparametric lines");
+        }
+
+        for (GLuint i = 0; i < v_isoparam_curves->GetColumnCount(); ++i) {
+            if (!(*v_isoparam_curves)(i)->UpdateVertexBufferObjects()) {
+                throw Exception("Failed to update VBO for isoparam. line");
+            }
+        }
+
+        transparentEmerald = MatFBEmerald;
+        transparentEmerald.SetTransparency(0.6f);
     } catch (Exception &e) {
         cout << e << endl;
     }
@@ -105,7 +226,42 @@ void GLWidget::paintGL()
 
     // render your geometry (this is oldest OpenGL rendering technique, later we
     // will use some advanced methods)
+    shaderProgram.Enable();
 
+    // First surface:
+    if (_show_original) {
+        MatFBBrass.Apply();
+        surface->Render();
+    }
+
+    // Interpolated surface:
+    if (_show_interpolated) {
+        glEnable(GL_BLEND);
+        glDepthMask(GL_FALSE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        transparentEmerald.Apply();
+        interpolatedSurface->Render();
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+    }
+    shaderProgram.Disable();
+
+    glLineWidth(2.f);
+    // Isoparametric lines:
+    if (_show_original) {
+        glColor3f(0.f, 4.f, 1.f);
+        for (GLuint i = 0; i < u_isoparam_curves->GetColumnCount(); ++i) {
+            (*u_isoparam_curves)(i)->RenderDerivatives(0, GL_LINE_STRIP);
+        }
+
+        for (GLuint i = 0; i < v_isoparam_curves->GetColumnCount(); ++i) {
+            (*v_isoparam_curves)(i)->RenderDerivatives(0, GL_LINE_STRIP);
+        }
+    }
+    // Control net for first surface:
+    glColor3f(1.f, 0.f, 0.f);
+    patch.RenderData();
+    glLineWidth(1.f);
 
 
     // pops the current matrix stack, replacing the current matrix with the one
@@ -201,6 +357,20 @@ void GLWidget::set_trans_z(double value)
         _trans_z = value;
         updateGL();
     }
+}
+
+
+
+void GLWidget::set_show_original_state(bool state)
+{
+    _show_original = state;
+    updateGL();
+}
+
+void GLWidget::set_show_interpolated_state(bool state)
+{
+    _show_interpolated = state;
+    updateGL();
 }
 
 } // namespace cagd
