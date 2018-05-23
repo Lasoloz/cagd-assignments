@@ -1,3 +1,6 @@
 # Ignore build directories:
 
 build-*/
+**/QtFramework.pro*
+QtFramework/QtFramework.pro.user*
+
