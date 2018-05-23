@@ -58,7 +58,7 @@ GLboolean RealSquareMatrix::PerformLUDecomposition()
 
     const GLdouble tiny = numeric_limits<GLdouble>::min();
 
-    GLuint           size = _data.size();
+    GLuint           size = (GLuint)_data.size();
     vector<GLdouble> implicit_scaling_of_each_row(size);
 
     _row_permutation.resize(size);

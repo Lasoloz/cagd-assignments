@@ -474,10 +474,10 @@ GLvoid TriangulatedMesh3::UnmapTextureBuffer() const
 
 
 // homework:
-GLuint TriangulatedMesh3::VertexCount() const { return _vertex.size(); }
+GLuint TriangulatedMesh3::VertexCount() const { return (GLuint)_vertex.size(); }
 
 // homework:
-GLuint TriangulatedMesh3::FaceCount() const { return _face.size(); }
+GLuint TriangulatedMesh3::FaceCount() const { return (GLuint)_face.size(); }
 
 TriangulatedMesh3::~TriangulatedMesh3() { DeleteVertexBufferObjects(); }
 

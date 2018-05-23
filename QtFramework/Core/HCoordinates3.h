@@ -154,7 +154,7 @@ inline GLfloat HCoordinate3::operator*(const HCoordinate3 &rhs) const
 }
 
 // homework: cross product
-const HCoordinate3 HCoordinate3::operator^(const HCoordinate3 &rhs) const
+inline const HCoordinate3 HCoordinate3::operator^(const HCoordinate3 &rhs) const
 {
     return HCoordinate3(_data[1] * rhs._data[2] - _data[2] * rhs._data[1],
                         _data[2] * rhs._data[0] - _data[0] * rhs._data[2],
@@ -163,28 +163,28 @@ const HCoordinate3 HCoordinate3::operator^(const HCoordinate3 &rhs) const
 }
 
 // homework: cross product with this
-HCoordinate3 &HCoordinate3::operator^=(const HCoordinate3 &rhs)
+inline HCoordinate3 &HCoordinate3::operator^=(const HCoordinate3 &rhs)
 {
     GLdouble xval = _data[1] * rhs._data[2] - _data[2] * rhs._data[1];
     GLdouble yval = _data[2] * rhs._data[0] - _data[0] * rhs._data[2];
     GLdouble zval = _data[0] * rhs._data[1] - _data[1] * rhs._data[0];
-    _data[0]      = xval;
-    _data[1]      = yval;
-    _data[2]      = zval;
+    _data[0]      = (GLfloat)xval;
+    _data[1]      = (GLfloat)yval;
+    _data[2]      = (GLfloat)zval;
     _data[3] *= rhs._data[3];
 
     return *this;
 }
 
 // homework: multiplicate with scalar from right
-const HCoordinate3 HCoordinate3::operator*(GLfloat rhs) const
+inline const HCoordinate3 HCoordinate3::operator*(GLfloat rhs) const
 {
     return HCoordinate3(_data[0] * rhs, _data[1] * rhs, _data[2] * rhs,
                         _data[3]);
 }
 
 // homework: multiplicate this with a scalar
-HCoordinate3 &HCoordinate3::operator*=(GLfloat rhs)
+inline HCoordinate3 &HCoordinate3::operator*=(GLfloat rhs)
 {
     _data[0] *= rhs;
     _data[1] *= rhs;
@@ -194,14 +194,14 @@ HCoordinate3 &HCoordinate3::operator*=(GLfloat rhs)
 }
 
 // homework: divide with scalar
-const HCoordinate3 HCoordinate3::operator/(GLfloat rhs) const
+inline const HCoordinate3 HCoordinate3::operator/(GLfloat rhs) const
 {
     return HCoordinate3(_data[0] / rhs, _data[1] / rhs, _data[2] / rhs,
                         _data[3]);
 }
 
 // homework: divide this with a scalar
-HCoordinate3 &HCoordinate3::operator/=(GLfloat rhs)
+inline HCoordinate3 &HCoordinate3::operator/=(GLfloat rhs)
 {
     _data[0] /= rhs;
     _data[1] /= rhs;
@@ -211,13 +211,13 @@ HCoordinate3 &HCoordinate3::operator/=(GLfloat rhs)
 }
 
 // homework: length of vector represented by this homogeneous coordinate
-GLfloat HCoordinate3::length() const
+inline GLfloat HCoordinate3::length() const
 {
     return _data[0] * _data[1] * _data[2] / (_data[3] * _data[3] * _data[3]);
 }
 
 // homework: normalize
-HCoordinate3 &HCoordinate3::normalize()
+inline HCoordinate3 &HCoordinate3::normalize()
 {
     GLfloat l = length();
 

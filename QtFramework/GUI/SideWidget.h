@@ -1,13 +1,14 @@
 #pragma once
 
-#include "ui_SideWidget.h"
 #include <QWidget>
+#include "ui_SideWidget.h"
 
-namespace cagd {
-class SideWidget : public QWidget, public Ui::SideWidget
+namespace cagd
 {
-public:
-    // special and default constructor
-    SideWidget(QWidget *parent = 0);
-};
-} // namespace cagd
+    class SideWidget: public QWidget, public Ui::SideWidget
+    {
+    public:
+        // special and default constructor
+        SideWidget(QWidget *parent = 0);
+    };
+}

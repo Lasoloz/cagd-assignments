@@ -349,7 +349,7 @@ DCoordinate3 moebius::d10(GLdouble u, GLdouble v)
     return DCoordinate3(x, y, z);
 }
 
-DCoordinate3 moebius::d01(GLdouble u, GLdouble v)
+DCoordinate3 moebius::d01(GLdouble u, GLdouble)
 {
     GLdouble half_u = u / 2;
     GLdouble x      = 0.5 * cos(half_u) * cos(u);

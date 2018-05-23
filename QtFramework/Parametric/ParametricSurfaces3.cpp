@@ -87,8 +87,8 @@ TriangulatedMesh3 *ParametricSurface3::GenerateImage(GLuint u_div_point_count,
             (*result)._normal[index[0]].normalize();
 
             // texture coordinates
-            (*result)._tex[index[0]].s() = s;
-            (*result)._tex[index[0]].t() = t;
+            (*result)._tex[index[0]].s() = (GLfloat)s;
+            (*result)._tex[index[0]].t() = (GLfloat)t;
 
             // connectivity information
             if (i < u_div_point_count - 1 && j < v_div_point_count - 1) {

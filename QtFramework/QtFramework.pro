@@ -65,12 +65,12 @@ HEADERS += \
     Core/TCoordinates4.h \
     Core/Materials.h \
     Core/Lights.h \
-    Core/HCoordinates3.h \
     Core/Colors4.h \
     Parametric/ParametricSurfaces3.h \
     Core/TensorProductSurfaces3.h \
     Core/ShaderPrograms.h \
-    Hyperbolic/SecondOrderHyperbolicPatch.h
+    Hyperbolic/SecondOrderHyperbolicPatch.h \
+    Core/HCoordinates3.h
 
 SOURCES += \
     GUI/GLWidget.cpp \
