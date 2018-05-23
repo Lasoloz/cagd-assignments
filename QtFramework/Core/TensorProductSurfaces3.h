@@ -5,9 +5,9 @@
 #include "Matrices.h"
 #include "TriangulatedMeshes3.h"
 #include <GL/glew.h>
+#include <algorithm>
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
 namespace cagd {
 class TensorProductSurface3

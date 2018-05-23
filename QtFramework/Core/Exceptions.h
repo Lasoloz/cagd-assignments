@@ -3,23 +3,22 @@
 #include <iostream>
 #include <string>
 
-namespace cagd
+namespace cagd {
+class Exception
 {
-    class Exception
-    {
-        friend std::ostream& operator <<(std::ostream& lhs, const Exception& rhs);
+    friend std::ostream &operator<<(std::ostream &lhs, const Exception &rhs);
 
-    protected:
-        std::string _reason;
+protected:
+    std::string _reason;
 
-    public:
-        Exception(const std::string &reason): _reason(reason)
-        {
-        }
-    };
+public:
+    Exception(const std::string &reason)
+        : _reason(reason)
+    {}
+};
 
-    inline std::ostream& operator <<(std::ostream& lhs, const Exception& rhs)
-    {
-        return lhs << rhs._reason;
-    }
+inline std::ostream &operator<<(std::ostream &lhs, const Exception &rhs)
+{
+    return lhs << rhs._reason;
 }
+} // namespace cagd

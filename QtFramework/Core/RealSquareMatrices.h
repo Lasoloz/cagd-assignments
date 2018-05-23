@@ -1,124 +1,116 @@
 #pragma once
 
-#include <GL/glew.h>
-#include <limits>
-#include <cmath>
 #include "Matrices.h"
+#include <GL/glew.h>
+#include <cmath>
+#include <limits>
 
-namespace cagd
+namespace cagd {
+class RealSquareMatrix : public Matrix<GLdouble>
 {
-    class RealSquareMatrix: public Matrix<GLdouble>
-    {
-    private:
-        GLboolean           _lu_decomposition_is_done;
-        std::vector<GLuint> _row_permutation;
+private:
+    GLboolean           _lu_decomposition_is_done;
+    std::vector<GLuint> _row_permutation;
 
 
-        void _copy(const RealSquareMatrix &m);
+    void _copy(const RealSquareMatrix &m);
 
-    public:
-        // special/default constructor
-        RealSquareMatrix(GLuint size = 1);
+public:
+    // special/default constructor
+    RealSquareMatrix(GLuint size = 1);
 
-        // copy constructor
-        RealSquareMatrix(const RealSquareMatrix& m);
+    // copy constructor
+    RealSquareMatrix(const RealSquareMatrix &m);
 
-        // assignment operator
-        RealSquareMatrix& operator =(const RealSquareMatrix& rhs);
+    // assignment operator
+    RealSquareMatrix &operator=(const RealSquareMatrix &rhs);
 
-        // square matrices have the same number of rows and columns!
-        GLboolean ResizeRows(GLuint row_count);
-        GLboolean ResizeColumns(GLuint row_count);
+    // square matrices have the same number of rows and columns!
+    GLboolean ResizeRows(GLuint row_count);
+    GLboolean ResizeColumns(GLuint row_count);
 
-        // tries to determine the LU decomposition of this square matrix
-        GLboolean PerformLUDecomposition();
+    // tries to determine the LU decomposition of this square matrix
+    GLboolean PerformLUDecomposition();
 
-        // Solves linear systems of type A * x = b, where A is a regular square matrix,
-        // while b and x are row or column matrices with elements of type T.
-        // Here matrix A corresponds to *this.
-        // Advantage: T can be either GLdouble or DCoordinate, 
-        // or any other type which has similar mathematical operators.
-        template <class T>
-        GLboolean SolveLinearSystem(const Matrix<T>& b, Matrix<T>& x, GLboolean represent_solutions_as_columns = GL_TRUE);
-    };
-
+    // Solves linear systems of type A * x = b, where A is a regular square
+    // matrix, while b and x are row or column matrices with elements of type T.
+    // Here matrix A corresponds to *this.
+    // Advantage: T can be either GLdouble or DCoordinate,
+    // or any other type which has similar mathematical operators.
     template <class T>
-    GLboolean RealSquareMatrix::SolveLinearSystem(const Matrix<T>& b, Matrix<T>& x, GLboolean represent_solutions_as_columns)
-    {
-        if (!_lu_decomposition_is_done)
-            if (!PerformLUDecomposition())
-                return GL_FALSE;
+    GLboolean
+    SolveLinearSystem(const Matrix<T> &b, Matrix<T> &x,
+                      GLboolean represent_solutions_as_columns = GL_TRUE);
+};
 
-        if (represent_solutions_as_columns)
-        {
-            GLint size = GetColumnCount();
-            if ((GLint)b.GetRowCount() != size)
-                    return GL_FALSE;
+template <class T>
+GLboolean
+RealSquareMatrix::SolveLinearSystem(const Matrix<T> &b, Matrix<T> &x,
+                                    GLboolean represent_solutions_as_columns)
+{
+    if (!_lu_decomposition_is_done)
+        if (!PerformLUDecomposition())
+            return GL_FALSE;
 
-            x = b;
+    if (represent_solutions_as_columns) {
+        GLint size = GetColumnCount();
+        if ((GLint)b.GetRowCount() != size)
+            return GL_FALSE;
 
-            for (GLuint k = 0; k < b.GetColumnCount(); ++k)
-            {
-                GLint ii = 0;
-                for (GLint i = 0; i < size; ++i)
-                {
-                    GLuint ip = _row_permutation[i];
-                    T sum = x(ip, k);
-                    x(ip, k) = x(i, k);
-                    if (ii != 0)
-                        for (GLint j = ii - 1; j < i; ++j)
-                            sum -= _data[i][j] * x(j, k);
-                    else
-                        if (sum != 0.0)
-                            ii = i + 1;
-                    x(i, k) = sum;
-                }
+        x = b;
 
-                for (GLint i = size - 1; i >= 0; --i)
-                {
-                    T sum = x(i, k);
-                    for (GLint j = i + 1; j < size; ++j)
+        for (GLuint k = 0; k < b.GetColumnCount(); ++k) {
+            GLint ii = 0;
+            for (GLint i = 0; i < size; ++i) {
+                GLuint ip  = _row_permutation[i];
+                T      sum = x(ip, k);
+                x(ip, k)   = x(i, k);
+                if (ii != 0)
+                    for (GLint j = ii - 1; j < i; ++j)
                         sum -= _data[i][j] * x(j, k);
-                    x(i, k) = sum /= _data[i][i];
-                }
+                else if (sum != 0.0)
+                    ii = i + 1;
+                x(i, k) = sum;
+            }
+
+            for (GLint i = size - 1; i >= 0; --i) {
+                T sum = x(i, k);
+                for (GLint j = i + 1; j < size; ++j)
+                    sum -= _data[i][j] * x(j, k);
+                x(i, k) = sum /= _data[i][i];
             }
         }
-        else
-        {
-            GLint size = GetRowCount();
-            if ((GLint)b.GetColumnCount() != size)
-                return GL_FALSE;
+    } else {
+        GLint size = GetRowCount();
+        if ((GLint)b.GetColumnCount() != size)
+            return GL_FALSE;
 
-            x = b;
+        x = b;
 
-            for (GLuint k = 0; k < b.GetRowCount(); ++k)
-            {
-                GLint ii = 0;
-                for (GLint i = 0; i < size; ++i)
-                {
-                    GLuint ip = _row_permutation[i];
-                    T sum = x(k, ip);
-                    x(k, ip) = x(k, i);
-                    if (ii != 0)
-                        for (GLint j = ii - 1; j < i; ++j)
-                            sum -= _data[i][j] * x(k, j);
-                    else
-                        if (sum != 0.0)
-                            ii = i + 1;
-                    x(k, i) = sum;
-                }
-
-                for (GLint i = size - 1; i >= 0; --i)
-                {
-                    T sum = x(k, i);
-                    for (GLint j = i + 1; j < size; ++j)
+        for (GLuint k = 0; k < b.GetRowCount(); ++k) {
+            GLint ii = 0;
+            for (GLint i = 0; i < size; ++i) {
+                GLuint ip  = _row_permutation[i];
+                T      sum = x(k, ip);
+                x(k, ip)   = x(k, i);
+                if (ii != 0)
+                    for (GLint j = ii - 1; j < i; ++j)
                         sum -= _data[i][j] * x(k, j);
-                    x(k, i) = sum /= _data[i][i];
-                }
+                else if (sum != 0.0)
+                    ii = i + 1;
+                x(k, i) = sum;
+            }
+
+            for (GLint i = size - 1; i >= 0; --i) {
+                T sum = x(k, i);
+                for (GLint j = i + 1; j < size; ++j)
+                    sum -= _data[i][j] * x(k, j);
+                x(k, i) = sum /= _data[i][i];
             }
         }
-
-        return GL_TRUE;
     }
 
+    return GL_TRUE;
 }
+
+} // namespace cagd

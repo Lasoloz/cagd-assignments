@@ -97,7 +97,7 @@ extern DCoordinate3 d01(GLdouble u, GLdouble v);
 } // namespace hyperboloid
 
 namespace sphere {
-extern QString surface_name;
+extern QString  surface_name;
 extern GLdouble radius;
 
 extern GLdouble u_min, u_max, v_min, v_max;
@@ -106,7 +106,7 @@ extern GLuint   u_div_count, v_div_count;
 extern DCoordinate3 d00(GLdouble u, GLdouble v);
 extern DCoordinate3 d10(GLdouble u, GLdouble v);
 extern DCoordinate3 d01(GLdouble u, GLdouble v);
-} // namespace perturbated_sphere
+} // namespace sphere
 
 namespace seashell {
 extern QString surface_name;
