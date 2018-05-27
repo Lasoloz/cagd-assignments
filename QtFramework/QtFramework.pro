@@ -70,7 +70,10 @@ HEADERS += \
     Core/TensorProductSurfaces3.h \
     Core/ShaderPrograms.h \
     Hyperbolic/SecondOrderHyperbolicPatch.h \
-    Core/HCoordinates3.h
+    Core/HCoordinates3.h \
+    Hyperbolic/SecondOrderHyperbolicArc.h \
+    Hyperbolic/SecondOrderHyperbolicCompositeCurve.h \
+    Hyperbolic/SecondOrderHyperbolicCompositeSurface.h
 
 SOURCES += \
     GUI/GLWidget.cpp \
@@ -89,6 +92,9 @@ SOURCES += \
     Parametric/ParametricSurfaces3.cpp \
     Core/TensorProductSurfaces3.cpp \
     Core/ShaderPrograms.cpp \
-    Hyperbolic/SecondOrderHyperbolicPatch.cpp
+    Hyperbolic/SecondOrderHyperbolicPatch.cpp \
+    Hyperbolic/SecondOrderHyperbolicArc.cpp \
+    Hyperbolic/SecondOrderHyperbolicCompositeCurve.cpp \
+    Hyperbolic/SecondOrderHyperbolicCompositeSurface.cpp
 
 #CONFIG += console

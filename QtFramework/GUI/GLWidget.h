@@ -12,6 +12,7 @@
 #include <Core/Materials.h>
 #include <Core/ShaderPrograms.h>
 #include <Hyperbolic/SecondOrderHyperbolicPatch.h>
+#include <Hyperbolic/SecondOrderHyperbolicArc.h>
 
 #include <string>
 #include <QTimer>
@@ -105,6 +106,11 @@ namespace cagd
         SecondOrderHyperbolicPatch *_patch, *_interpolated_patch;
         TriangulatedMesh3 *_beforeInterpolation, *_afterInterpolation;
 
+        SecondOrderHyperbolicArc    *_arc;
+        GenericCurve3               *_img_arc;
+
+        GenericCurve3* initHyperbolicArc(SecondOrderHyperbolicArc*& arc);
+        void renderHyperbolicArc(SecondOrderHyperbolicArc* arc, GenericCurve3* img_arc);
     public:
         // special and default constructor
         // the format specifies the properties of the rendering window

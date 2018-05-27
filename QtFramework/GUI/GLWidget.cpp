@@ -25,6 +25,8 @@ namespace cagd{
         _interpolated_patch = 0;
         _u_dir = 0;
         _v_dir = 0;
+        _arc = 0;
+        _img_arc = 0;
 
         _color[0] = _color[1] = _color[2] = _color[3] = 0.f;
         _shading = _smoothing = _scaleFactor = 0.1f;
@@ -109,6 +111,16 @@ namespace cagd{
             delete _interpolated_patch;
             _interpolated_patch = 0;
         }
+
+        if (_arc) {
+            delete _arc;
+            _arc = 0;
+        }
+
+        if (_img_arc) {
+            delete _img_arc;
+            _img_arc = 0;
+        }
     }
 
     //--------------------------------------------------------------------------------------
@@ -182,14 +194,75 @@ namespace cagd{
                                    "Shaders/two_sided_lighting.frag",
                                    GL_TRUE);
 
-            initHyperbolicSurface();
-            _surfaceSelected = true;
-
+//            initHyperbolicSurface();
+//            _surfaceSelected = true;
+            _img_arc = initHyperbolicArc(_arc);
         }
         catch (Exception &e)
         {
             cout << e << endl;
         }
+    }
+
+    GenericCurve3* GLWidget::initHyperbolicArc(SecondOrderHyperbolicArc *& arc)
+    {
+        releaseResources();
+
+        _n = 4; // 5 kontroll pont
+        arc = new (nothrow) SecondOrderHyperbolicArc(1);
+
+        if (!arc)
+        {
+            throw Exception("Could not create the second order hyperbolic arc!");
+        }
+
+        try
+        {
+            GLdouble step = TWO_PI / (_n);
+            for (GLuint i = 0; i < _n; ++i)
+            {
+                GLuint u = i * step;
+                DCoordinate3 &cp = (*arc)[i]; // ez a p(i) vektor
+
+                cp[0] = cos(u);
+                cp[1] = sin(u);
+                cp[2] = -2.0 + 4.0 * (GLdouble)rand()/RAND_MAX;// kesobb
+            }
+
+            if (!arc->UpdateVertexBufferObjectsOfData())
+            {
+                throw Exception("Could not update update the VBOs of the second order hyperbolic arc's control polygon");
+            }
+
+            _mod = 1;
+            _div = 50;
+            GenericCurve3 *img_arc = arc->GenerateImage(_mod, _div);
+
+            if (!img_arc)
+            {
+                throw Exception("Could not generate the image of the second order hyperbolic arc!");
+            }
+
+            if (!img_arc->UpdateVertexBufferObjects())
+            {
+                throw Exception("Couldn't generate the VBO of the second order hyperbolic arc!");
+            }
+
+            return img_arc;
+        }
+        catch (Exception &e)
+        {
+            cout << e << endl;
+        }
+
+//        _interpolating_cyclic_curve = false;
+//        _off_model = false;
+//        _surfaceSelected = false;
+
+//        _cyclic_curve = true;
+
+//        updateGL();
+        return 0;
     }
 
     void GLWidget::initModel(const string &fileName)
@@ -235,24 +308,25 @@ namespace cagd{
 
             // render your geometry (this is oldest OpenGL rendering technique, later we will use some advanced methods)
 
-            if (_interpolating_cyclic_curve || _cyclic_curve)
-            {
-                paintCyclicCurve();
-            }
-            else
-            {
-                if (_off_model)
-                {
-                    paintModel();
-                }
-                else
-                {
-                    if (_surfaceSelected)
-                    {
-                        paintHyperbolicSurface();
-                    }
-                }
-            }
+            renderHyperbolicArc(_arc, _img_arc);
+//            if (_interpolating_cyclic_curve || _cyclic_curve)
+//            {
+//                paintCyclicCurve();
+//            }
+//            else
+//            {
+//                if (_off_model)
+//                {
+//                    paintModel();
+//                }
+//                else
+//                {
+//                    if (_surfaceSelected)
+//                    {
+//                        paintHyperbolicSurface();
+//                    }
+//                }
+//            }
 
 
         // pops the current matrix stack, replacing the current matrix with the one below it on the stack,
@@ -310,6 +384,29 @@ namespace cagd{
         _model->UnmapNormalBuffer();
 
         updateGL();
+    }
+
+    void GLWidget::renderHyperbolicArc(SecondOrderHyperbolicArc* arc, GenericCurve3* img_arc)
+    {
+        if (arc)
+        {
+            glColor3f(1.f, 0.f, .0f);
+            arc->RenderData(GL_LINE_STRIP);
+        }
+
+        if (img_arc)
+        {
+            glColor3f(.2f, 1.f, .2f);
+            glLineWidth(2.f);
+            img_arc->RenderDerivatives(0, GL_LINE_STRIP);
+            glLineWidth(1.f);
+
+            if (_firstOrderDerivativeEnabled)
+            {
+                glColor3f(.2f, .5f, .7f);
+                img_arc->RenderDerivatives(1, GL_LINES);
+            }
+        }
     }
 
     void GLWidget::paintCyclicCurve()

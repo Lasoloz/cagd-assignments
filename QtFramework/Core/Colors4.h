@@ -23,6 +23,27 @@ public:
         _data[3] = a;
     }
 
+    Color4(const Color4 &color)
+    {
+        _data[0] = color._data[0];
+        _data[1] = color._data[1];
+        _data[2] = color._data[2];
+        _data[3] = color._data[3];
+    }
+
+    Color4& operator=(const Color4 &color)
+    {
+        if (this != &color)
+        {
+            _data[0] = color._data[0];
+            _data[1] = color._data[1];
+            _data[2] = color._data[2];
+            _data[3] = color._data[3];
+        }
+
+        return *this;
+    }
+
     // homework: get components by value
     GLfloat operator[](GLuint rhs) const { return _data[rhs]; }
     GLfloat r() const { return _data[0]; }
