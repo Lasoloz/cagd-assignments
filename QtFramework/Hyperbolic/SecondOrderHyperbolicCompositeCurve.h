@@ -3,6 +3,8 @@
 #include "SecondOrderHyperbolicArc.h"
 #include "../Core/GenericCurves3.h"
 #include "../Core/Colors4.h"
+#include "../Core/TriangulatedMeshes3.h"
+#include "../Core/DCoordinates3.h"
 
 namespace cagd
 {
@@ -22,7 +24,8 @@ namespace cagd
             ArcAttributes *next;
             ArcAttributes *previous;
 
-            ArcAttributes(SecondOrderHyperbolicArc* arc, GenericCurve3 *image, Color4 *color);
+            ArcAttributes();
+            ArcAttributes(SecondOrderHyperbolicArc* arc);
             ArcAttributes(const ArcAttributes &attribute);
 
             ArcAttributes& operator=(const ArcAttributes &attribute);
@@ -36,15 +39,38 @@ namespace cagd
             // setterek/getterek ha szuksegesek
 
         };
+    private:
+        SecondOrderHyperbolicArc* initCurve();
     protected:
         std::vector<ArcAttributes> 	_attributes; // esetleg lehet list is
         GLdouble 					_alpha;
+        GLuint                      _div_point_count;
+
+        GLboolean                   _renderCurve;
+        GLboolean                   _renderControlPoints;
+        GLboolean                   _renderControlPolygon;
+        GLboolean                   _renderFirstOrderDerivatives;
+
+        TriangulatedMesh3           _sphere;
+        GLdouble                    _radius;
+
     public:
          // max arc counttot reservelunk, mert hanem baj lehet a next es previous pointerek miatt
         SecondOrderHyperbolicCompositeCurve(GLdouble alpha, GLuint max_arc_count = 1000);
-//            GLboolean insertIsolatedArc(SecondOrderHyperbolicArc* arc);
+        GLboolean insertIsolatedArc();
+        GLboolean render();
 
-//            GLboolean render();
+        GLvoid setRenderCurve(GLboolean value);
+        GLvoid setRenderControlPolygon(GLboolean value);
+        GLvoid setRenderControlPoints(GLboolean value);
+        GLvoid setRenderFirstOrderDerivatives(GLboolean value);
+
+        GLboolean join(GLuint index1, Direction direction1, GLuint index2, Direction direction2);
+        GLboolean merge(GLuint index1, Direction direction1, GLuint index2, Direction direction2);
+        GLboolean erease(GLuint index);
+        GLboolean continueExistingArc(GLuint index, Direction direction);
+//        GLboolean manipulateCurve(Gluint index, DCoordinate3 )
+
 //            SecondOrderHyperbolicArc* getArc(GLint pos);
 //            GLboolean insertIsolatedArc(GLint pos_x, GLint pos_y, GLfloat size);
 //            GLboolean continueArc(GLuint index, Direction direction);

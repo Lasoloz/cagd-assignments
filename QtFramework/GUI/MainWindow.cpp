@@ -75,7 +75,7 @@ namespace cagd
         connect(_side_widget->scaleFactorSpinBox, SIGNAL(valueChanged(double)), _gl_widget, SLOT(set_scale_factor(double)));
         connect(_side_widget->smoothingSpinBox, SIGNAL(valueChanged(double)), _gl_widget, SLOT(set_smoothing(double)));
         connect(_side_widget->shadingSpinBox, SIGNAL(valueChanged(double)), _gl_widget, SLOT(set_shading(double)));
-        connect(_side_widget->alphaSpinBox, SIGNAL(valueChanged(double)), _gl_widget, SLOT(set_alpha(int)));
+        connect(_side_widget->alphaSpinBox, SIGNAL(valueChanged(double)), _gl_widget, SLOT(set_alpha(double)));
     }
 
     //--------------------------------
