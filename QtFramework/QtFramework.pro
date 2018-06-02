@@ -73,7 +73,8 @@ HEADERS += \
     Core/HCoordinates3.h \
     Hyperbolic/SecondOrderHyperbolicArc.h \
     Hyperbolic/SecondOrderHyperbolicCompositeCurve.h \
-    Hyperbolic/SecondOrderHyperbolicCompositeSurface.h
+    Hyperbolic/SecondOrderHyperbolicCompositeSurface.h \
+    Hyperbolic/util/CompositeSurfaceElement.hpp
 
 SOURCES += \
     GUI/GLWidget.cpp \
@@ -95,6 +96,7 @@ SOURCES += \
     Hyperbolic/SecondOrderHyperbolicPatch.cpp \
     Hyperbolic/SecondOrderHyperbolicArc.cpp \
     Hyperbolic/SecondOrderHyperbolicCompositeCurve.cpp \
-    Hyperbolic/SecondOrderHyperbolicCompositeSurface.cpp
+    Hyperbolic/SecondOrderHyperbolicCompositeSurface.cpp \
+    Hyperbolic/util/CompositeSurfaceElement.cpp
 
 #CONFIG += console
