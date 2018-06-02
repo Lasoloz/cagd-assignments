@@ -34,6 +34,10 @@ namespace cagd{
         _interpolating_cyclic_curve = _cyclic_curve = _off_model = false;
         _surfaceSelected = _grid = _mesh = _points = _interpolate = false;
 
+        _named_object_clicked = GL_FALSE;
+        _reposition_unit     = 0.05;
+        _row = _column = 1024; // dummy value
+
         _isoLineCount = 10;
         _gridDivPointCount = 10;
 
@@ -193,19 +197,6 @@ namespace cagd{
 //            _surfaceSelected = true;
             _composite = new (nothrow)SecondOrderHyperbolicCompositeCurve(10);
             _composite->insertIsolatedArc();
-            _composite->continueExistingArc(0, SecondOrderHyperbolicCompositeCurve::Direction::RIGHT);
-            _composite->continueExistingArc(3, SecondOrderHyperbolicCompositeCurve::Direction::RIGHT);
-            _composite->join(4, SecondOrderHyperbolicCompositeCurve::Direction::RIGHT, 0, SecondOrderHyperbolicCompositeCurve::Direction::LEFT);
-//            _composite->join(2, SecondOrderHyperbolicCompositeCurve::Direction::LEFT, 1, SecondOrderHyperbolicCompositeCurve::Direction::RIGHT);
-            _composite->merge(1, SecondOrderHyperbolicCompositeCurve::Direction::RIGHT, 2, SecondOrderHyperbolicCompositeCurve::Direction::RIGHT);
-//            _composite->merge(0, SecondOrderHyperbolicCompositeCurve::Direction::LEFT, 2, SecondOrderHyperbolicCompositeCurve::Direction::RIGHT);
-//            _composite->erease(2);
-            _composite->erease(0);
-//            _composite->erease(0);
-//            _composite->erease(0);
-//            _composite->setRenderControlPoints(GL_TRUE);
-            _composite->setRenderControlPolygon(GL_TRUE);
-//            _composite->setRenderFirstOrderDerivatives(GL_TRUE);
         }
         catch (Exception &e)
         {
@@ -566,6 +557,133 @@ namespace cagd{
         updateGL();
     }
 
+    void GLWidget::mousePressEvent(QMouseEvent *event)
+    {
+        event->accept();
+
+        if (event->button() == Qt::LeftButton)
+        {
+            GLint viewport[4];
+            glGetIntegerv(GL_VIEWPORT, viewport);
+
+            GLuint size = 4 * 4 * _composite->getCurveCount();
+            GLuint *pick_buffer = new GLuint[size];
+            glSelectBuffer(size, pick_buffer);
+
+            glRenderMode(GL_SELECT);
+
+            glInitNames();
+            glPushName(0);
+
+            GLfloat projection_matrix[16];
+            glGetFloatv(GL_PROJECTION_MATRIX, projection_matrix);
+
+            glMatrixMode(GL_PROJECTION);
+
+            glPushMatrix();
+
+            glLoadIdentity();
+            gluPickMatrix((GLdouble)event->x(), (GLdouble)(viewport[3] - event->y()), 5.0, 5.0, viewport);
+
+            glMultMatrixf(projection_matrix);
+
+            glMatrixMode(GL_MODELVIEW);
+
+            glPushMatrix();
+
+                // rotating around the coordinate axes
+                glRotatef(_angle_x, 1.0, 0.0, 0.0);
+                glRotatef(_angle_y, 0.0, 1.0, 0.0);
+                glRotatef(_angle_z, 0.0, 0.0, 1.0);
+
+                // translate
+                glTranslated(_trans_x, _trans_y, _trans_z);
+
+                // scaling
+                glScalef(_zoom, _zoom, _zoom);
+
+                // render only the clickable geometries
+                _composite->renderClickable(true);
+
+            glPopMatrix();
+
+            glMatrixMode(GL_PROJECTION);
+            glPopMatrix();
+
+            glMatrixMode(GL_MODELVIEW);
+
+            GLint hit_count = glRenderMode(GL_RENDER);
+
+            if (hit_count)
+            {
+                GLuint closest_selected = pick_buffer[3];
+                GLuint closest_depth    = pick_buffer[1];
+
+
+                for (GLuint i = 1; i < hit_count; ++i)
+                {
+                    GLuint offset = i * 4;
+                    if (pick_buffer[offset + 1] < closest_depth)
+                    {
+                        closest_selected = pick_buffer[offset + 3];
+                        closest_depth    = pick_buffer[offset + 1];
+                    }
+                }
+
+                _composite->setSelected(_row, GL_FALSE);
+
+                _row    = closest_selected / 4;
+                _column = closest_selected % 4;
+
+                _composite->setSelected(_row, GL_TRUE);
+
+                _named_object_clicked = GL_TRUE;
+            }
+            else
+            {
+                _named_object_clicked = GL_FALSE;
+            }
+
+            delete pick_buffer;
+
+            updateGL();
+        }
+    }
+
+    void GLWidget::wheelEvent(QWheelEvent *event)
+    {
+        event->accept();
+
+        if (_named_object_clicked)
+        {
+            DCoordinate3 point = _composite->getPoint(_row, _column);// _positions(_row, _column);
+            GLdouble     &x     = point[0];
+            GLdouble     &y     = point[1];
+            GLdouble     &z     = point[2];
+
+            // wheel + Ctrl
+            if (event->modifiers() & Qt::ControlModifier)
+            {
+                x += event->delta() / 120.0 * _reposition_unit;
+            }
+
+            // wheel + Alt
+            if (event->modifiers() & Qt::AltModifier)
+            {
+                y += event->delta() / 120.0 * _reposition_unit;
+            }
+
+            if (event->modifiers() & Qt::ShiftModifier)
+            {
+                z += event->delta() / 120.0 * _reposition_unit;
+            }
+
+            _composite->updateCurve(_row, _column, point);
+
+            updateGL();
+        }
+    }
+
     //-----------------------------------
     // implementation of the public slots
     //-----------------------------------
@@ -633,152 +751,29 @@ namespace cagd{
         }
     }
 
-    void GLWidget::set_firstOrderDerivativeEnabled(bool value)
+    void GLWidget::set_firstOrderDerivative(bool value)
     {
-        _firstOrderDerivativeEnabled = value;
+        _composite->setRenderFirstOrderDerivatives(value);
         updateGL();
     }
 
-    void GLWidget::set_secondOrderDerivativeEnabled(bool value)
+    void GLWidget::set_control_points(bool value)
     {
-        _firstOrderDerivativeEnabled = value;
-        updateGL();
-    }
-
-    void GLWidget::init_cyclic_curve(bool)
-    {
-        releaseResources();
-
-        _n = 2; // 5 kontroll pont
-        _cc = new (nothrow) CyclicCurve3(_n);
-
-        if (!_cc)
-        {
-            throw Exception("Could not create the cyclic curve!");
-        }
-
-        try
-        {
-            GLdouble step = TWO_PI / (2 * _n + 1);
-            for (GLuint i = 0; i <= 2 * _n; ++i)
-            {
-                GLuint u = i * step;
-                DCoordinate3 &cp = (*_cc)[i]; // ez a p(i) vektor
-
-                cp[0] = cos(u);
-                cp[1] = sin(u);
-                cp[2] = 0.0; // -2.0 + 4.0 * (GLdouble)rand()/RAND_MAX; kesobb
-            }
-
-            if (!_cc->UpdateVertexBufferObjectsOfData())
-            {
-                throw Exception("Could not update update the VBOs of the cyclic curve's control polygon");
-            }
-
-            _mod = 3;
-            _div = 50;
-            _img_cc = _cc->GenerateImage(_mod, _div);
-
-            if (!_img_cc)
-            {
-                throw Exception("Could not generate the image of the cyclic curve!");
-            }
-
-            if (!_img_cc->UpdateVertexBufferObjects())
-            {
-                throw Exception("Couldn't generate the VBO of the parametric curve!");
-            }
-        }
-        catch (Exception &e)
-        {
-            cout << e << endl;
-        }
-
-        _interpolating_cyclic_curve = false;
-        _off_model = false;
-        _surfaceSelected = false;
-
-        _cyclic_curve = true;
-
-        updateGL();
-    }
-
-    void GLWidget::init_interpolating_cyclic_curve(bool)
-    {
-        releaseResources();
-
-        _n = 2;
-        _cc = new (nothrow) CyclicCurve3(_n);
-
-        if (!_cc)
-        {
-            throw Exception("Could not create the cyclic curve!");
-        }
-
-        try
-        {
-            _knot_vector.ResizeRows (2 * _n + 1);
-            _data_points_to_interpolate.ResizeRows (2 * _n + 1);
-
-            GLdouble step = TWO_PI / (2 * _n + 1);
-            for (GLuint i = 0; i <= 2 * _n; ++i)
-            {
-                GLdouble u = i * step;
-                _knot_vector[i] = u;
-                DCoordinate3 &cp = (*_cc)[i];
-
-                cp[0] = cos (u);
-                cp[1] = sin (u);
-                cp[2] = -2.0 + 4.0 * (GLdouble)rand() / RAND_MAX;
-
-                _data_points_to_interpolate[i] = cp;
-            }
-
-            if (!_cc->UpdateDataForInterpolation(_knot_vector, _data_points_to_interpolate))
-            {
-                throw Exception("Could not generate interpolated cyclic curve!");
-            }
-
-            if (!_cc->UpdateVertexBufferObjectsOfData())
-            {
-                throw Exception("Could not update update the VBOSs of the cyclic curve's control polygon!");
-            }
-
-            _mod = 3;
-            _div = 50;
-            _img_cc = _cc->GenerateImage(_mod, _div);
-
-            if (!_img_cc)
-            {
-                throw Exception("Could not generate the image of the cyclic curve!");
-            }
-
-            if (!_img_cc->UpdateVertexBufferObjects())
-            {
-                throw Exception("Couldn't generate the VBO of the parametric curve!");
-            }
-        }
-        catch (Exception &e)
-        {
-            cout << e << endl;
-        }
-
-        _cyclic_curve = false;
-        _off_model = false;
-        _surfaceSelected = false;
-
-        _interpolating_cyclic_curve = true;
-
+        _composite->setRenderControlPoints(value);
         updateGL();
     }
 
     void GLWidget::set_control_polygon(bool value)
     {
-        _control_polygon = value;
-
+        _composite->setRenderControlPolygon(value);
         updateGL();
     }
 
+    void GLWidget::set_curve_image(bool value)
+    {
+        _composite->setRenderCurve(value);
+        updateGL();
+    }
 
     void GLWidget::set_off_model_selected(bool value)
     {
@@ -944,6 +939,18 @@ namespace cagd{
         _shader.SetUniformVariable1f("shading", _shading);
         _shader.Disable();
 
+        updateGL();
+    }
+
+    void GLWidget::insert_isolated_arc()
+    {
+        _composite->insertIsolatedArc();
+        updateGL();
+    }
+
+    void GLWidget::remove_arc()
+    {
+        _composite->erease(_row);
         updateGL();
     }
 }

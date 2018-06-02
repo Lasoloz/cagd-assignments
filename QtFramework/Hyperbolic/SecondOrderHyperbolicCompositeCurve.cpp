@@ -15,6 +15,7 @@ namespace cagd
         this->color = nullptr;
         this->next = nullptr;
         this->previous = nullptr;
+        this->selected = GL_FALSE;
     }
 
     SecondOrderHyperbolicCompositeCurve::ArcAttributes::ArcAttributes(
@@ -25,6 +26,7 @@ namespace cagd
         this->color = new Color4(0.3f, 1.0f, 0.0f, 1.0f); // default red color
         this->next = nullptr;
         this->previous = nullptr;
+        this->selected = GL_FALSE;
     }
 
     SecondOrderHyperbolicCompositeCurve::ArcAttributes::ArcAttributes(const ArcAttributes &attribute)
@@ -45,6 +47,8 @@ namespace cagd
         else
             this->color = nullptr;
 
+        this->selected = attribute.selected;
+
         this->next = attribute.next;
         this->previous = attribute.previous;
     }
@@ -56,6 +60,8 @@ namespace cagd
             *(this->arc) = *attribute.arc;
             *(this->image) = *attribute.image;
             *(this->color) = *attribute.color;
+
+            this->selected = attribute.selected;
 
             this->next = attribute.next;
             this->previous = attribute.previous;
@@ -107,62 +113,30 @@ namespace cagd
         {
             throw Exception("Could not update VBO's of sphere!");
         }
+
+        _selectedColor.r() = 0.2f;
+        _selectedColor.g() = 0.6f;
+        _selectedColor.b() = 1.0f;
     }
 
     GLboolean SecondOrderHyperbolicCompositeCurve::insertIsolatedArc()
     {
-        // ------------- for testing -------------
-        for (GLuint i = 1; i <= 3; ++i)
+        SecondOrderHyperbolicArc* arc = initCurve();
+        ArcAttributes attribute(arc);
+
+        _attributes.push_back(attribute);
+        _attributes.back().arc = initCurve();// new SecondOrderHyperbolicArc(_alpha);
+
+        _attributes.back().image = _attributes.back().arc->GenerateImage(1, _div_point_count);
+
+        if (!_attributes.back().image)
         {
-            GLuint _n = 4;
-            SecondOrderHyperbolicArc* arc = new (nothrow) SecondOrderHyperbolicArc(_alpha);
+            throw Exception("Could not generate the image of the second order hyperbolic arc!");
+        }
 
-            if (!arc)
-            {
-                throw Exception("Could not create the second order hyperbolic arc!");
-            }
-
-            try
-            {
-                GLdouble step = TWO_PI / (_n);
-                for (GLuint j = 0; j < _n; ++j)
-                {
-                    GLdouble u = j * step;
-                    DCoordinate3 &cp = (*arc)[j]; // ez a p(i) vektor
-
-                    cp[0] = cos(u) * i;
-                    cp[1] = sin(u) * i * i;
-                    cp[2] = -2.0 + 4.0 * (GLdouble)rand()/RAND_MAX;// kesobb
-                }
-
-                if (!arc->UpdateVertexBufferObjectsOfData())
-                {
-                    throw Exception("Could not update update the VBOs of the second order hyperbolic arc's control polygon");
-                }
-            }
-            catch (Exception &e)
-            {
-                cout << e << endl;
-            }
-            // ------------- for testing -------------
-
-//            SecondOrderHyperbolicArc* arc = initCurve();
-            ArcAttributes attribute(arc);
-
-            _attributes.push_back(attribute);
-    //        _attributes.back().arc = initCurve();// new SecondOrderHyperbolicArc(_alpha);
-
-    //        _attributes.back().image = _attributes.back().arc->GenerateImage(1, _div_point_count);
-
-            if (!_attributes.back().image)
-            {
-                throw Exception("Could not generate the image of the second order hyperbolic arc!");
-            }
-
-            if (!_attributes.back().image->UpdateVertexBufferObjects())
-            {
-                throw Exception("Couldn't generate the VBO of the second order hyperbolic arc!");
-            }
+        if (!_attributes.back().image->UpdateVertexBufferObjects())
+        {
+            throw Exception("Couldn't generate the VBO of the second order hyperbolic arc!");
         }
 
         return GL_TRUE;
@@ -180,32 +154,55 @@ namespace cagd
 
             if (i.image && _renderCurve)
             {
-                glColor3f(i.color->r(), i.color->g(), i.color->b());
+                if (!i.selected)
+                    glColor3f(i.color->r(), i.color->g(), i.color->b());
+                else
+                    glColor3f(_selectedColor.r(), _selectedColor.g(), _selectedColor.b());
+
                 glLineWidth(2.f);
                 i.image->RenderDerivatives(0, GL_LINE_STRIP);
                 glLineWidth(1.f);
-
-                if (_renderFirstOrderDerivatives)
-                {
-                    glColor3f(.2f, .5f, .7f);
-                    i.image->RenderDerivatives(1, GL_LINES);
-                }
             }
 
-            if (_renderControlPoints)
+            if (i.image && _renderFirstOrderDerivatives)
             {
-                for (GLuint j = 0; j < 4; ++j)
-                {
-                    DCoordinate3 &cp = (*i.arc)[j];
+                glColor3f(.2f, .5f, .7f);
+                i.image->RenderDerivatives(1, GL_LINES);
+            }
 
-                    glPushMatrix();
-                        glTranslated(cp[0], cp[1], cp[2]);
-                        glScaled(_radius, _radius, _radius);
-                        MatFBBrass.Apply();
-//                        _shader.Enable();
-                        _sphere.Render();
-//                        _shader.Disable();
-                    glPopMatrix();
+            renderClickable(false);
+        }
+
+        return GL_TRUE;
+    }
+
+    GLboolean SecondOrderHyperbolicCompositeCurve::renderClickable(GLboolean withNames)
+    {
+        if (_renderControlPoints)
+        {
+            GLuint count = -1;
+            for (auto &i : _attributes)
+            {
+                ++count;
+
+                if (_renderControlPoints)
+                {
+                    for (GLuint j = 0; j < 4; ++j)
+                    {
+                        DCoordinate3 &cp = (*i.arc)[j];
+
+                        if (withNames)
+                            glLoadName(count * 4 + j);
+
+                        glPushMatrix();
+                            glTranslated(cp[0], cp[1], cp[2]);
+                            glScaled(_radius, _radius, _radius);
+                            MatFBBrass.Apply();
+    //                        _shader.Enable();
+                            _sphere.Render();
+    //                        _shader.Disable();
+                        glPopMatrix();
+                    }
                 }
             }
         }
@@ -489,6 +486,28 @@ namespace cagd
         return GL_TRUE;
     }
 
+    GLboolean SecondOrderHyperbolicCompositeCurve::updateCurve(GLuint curveIndex, GLuint controlPointIndex, DCoordinate3 value)
+    {
+        if (curveIndex >= _attributes.size() || controlPointIndex > 3)
+            return GL_FALSE;
+
+        (*_attributes[curveIndex].arc)[controlPointIndex] = value;
+
+        _attributes[curveIndex].image = _attributes[curveIndex].arc->GenerateImage(1, _div_point_count);
+
+        if (!_attributes[curveIndex].arc->UpdateVertexBufferObjectsOfData())
+        {
+            throw Exception("Could not update the VBOoD's hyperbolic arc!");
+        }
+
+        if (!_attributes[curveIndex].image->UpdateVertexBufferObjects())
+        {
+            throw Exception("Could not update the VBO's of the hyperbolic arc image!");
+        }
+
+        return GL_TRUE;
+    }
+
     SecondOrderHyperbolicArc* SecondOrderHyperbolicCompositeCurve::initCurve()
     {
         GLuint _n = 4; // 4 kontroll pont
@@ -525,6 +544,31 @@ namespace cagd
         }
 
         return nullptr;
+    }
+
+    DCoordinate3 SecondOrderHyperbolicCompositeCurve::getPoint(GLuint curveIndex, GLuint controlPointIndex)
+    {
+        if (curveIndex >= _attributes.size() || controlPointIndex > 3)
+        {
+            throw Exception("Index out of bounds");
+        }
+
+        return (*_attributes[curveIndex].arc)[controlPointIndex];
+    }
+
+    GLboolean SecondOrderHyperbolicCompositeCurve::setSelected(GLuint index, GLboolean value)
+    {
+        if (index >= _attributes.size())
+            return GL_FALSE;
+
+        _attributes[index].selected = value;
+
+        return GL_TRUE;
+    }
+
+    GLuint SecondOrderHyperbolicCompositeCurve::getCurveCount()
+    {
+        return (GLuint)_attributes.size();
     }
 
     GLvoid SecondOrderHyperbolicCompositeCurve::setRenderCurve(GLboolean value)

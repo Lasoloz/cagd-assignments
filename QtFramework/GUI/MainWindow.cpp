@@ -49,16 +49,10 @@ namespace cagd
         connect(_side_widget->trans_y_spin_box, SIGNAL(valueChanged(double)), _gl_widget, SLOT(set_trans_y(double)));
         connect(_side_widget->trans_z_spin_box, SIGNAL(valueChanged(double)), _gl_widget, SLOT(set_trans_z(double)));
 
-        connect(_side_widget->firstOrderDerivatives, SIGNAL(clicked(bool)), _gl_widget, SLOT(set_firstOrderDerivativeEnabled(bool)));
-        connect(_side_widget->secondOrderDerivatives, SIGNAL(clicked(bool)), _gl_widget, SLOT(set_secondOrderDerivativeEnabled(bool)));
-        connect(_side_widget->interpolatingCurveRButton, SIGNAL(toggled(bool)), _gl_widget, SLOT(init_interpolating_cyclic_curve(bool)));
-        connect(_side_widget->cyclicCurvesRButton, SIGNAL(toggled(bool)), _gl_widget, SLOT(init_cyclic_curve(bool)));
-
-        connect(_side_widget->checkBox, SIGNAL(toggled(bool)), _gl_widget, SLOT(set_control_polygon(bool)));
 
         connect(_side_widget->loadButton, SIGNAL(clicked(bool)), _gl_widget, SLOT(browseFile(bool)));
 
-        connect(_side_widget->hyperbolicRButton, SIGNAL(toggled(bool)), _gl_widget, SLOT(select_surface(bool)));
+//        connect(_side_widget->hyperbolicRButton, SIGNAL(toggled(bool)), _gl_widget, SLOT(select_surface(bool)));
 
         connect(_side_widget->grid, SIGNAL(toggled(bool)), _gl_widget, SLOT(set_grid(bool)));
         connect(_side_widget->mesh, SIGNAL(toggled(bool)), _gl_widget, SLOT(set_mesh(bool)));
@@ -76,6 +70,15 @@ namespace cagd
         connect(_side_widget->smoothingSpinBox, SIGNAL(valueChanged(double)), _gl_widget, SLOT(set_smoothing(double)));
         connect(_side_widget->shadingSpinBox, SIGNAL(valueChanged(double)), _gl_widget, SLOT(set_shading(double)));
         connect(_side_widget->alphaSpinBox, SIGNAL(valueChanged(double)), _gl_widget, SLOT(set_alpha(double)));
+
+
+        connect(_side_widget->firstOrderDerivatives, SIGNAL(clicked(bool)), _gl_widget, SLOT(set_firstOrderDerivative(bool)));
+        connect(_side_widget->controlPolygon, SIGNAL(toggled(bool)), _gl_widget, SLOT(set_control_polygon(bool)));
+        connect(_side_widget->controlPoints, SIGNAL(toggled(bool)), _gl_widget, SLOT(set_control_points(bool)));
+        connect(_side_widget->curveImage, SIGNAL(toggled(bool)), _gl_widget, SLOT(set_curve_image(bool)));
+
+        connect(_side_widget->insertNewArcButton, SIGNAL(pressed()), _gl_widget, SLOT(insert_isolated_arc()));
+        connect(_side_widget->ereaseArcButton, SIGNAL(pressed()), _gl_widget, SLOT(remove_arc()));
     }
 
     //--------------------------------

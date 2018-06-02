@@ -20,6 +20,7 @@ namespace cagd
             GenericCurve3               *image;
             Color4                      *color;
 //            ... // projekt specifikus attributumok
+            GLboolean selected;
 
             ArcAttributes *next;
             ArcAttributes *previous;
@@ -54,6 +55,7 @@ namespace cagd
         TriangulatedMesh3           _sphere;
         GLdouble                    _radius;
 
+        Color4                      _selectedColor;
     public:
          // max arc counttot reservelunk, mert hanem baj lehet a next es previous pointerek miatt
         SecondOrderHyperbolicCompositeCurve(GLdouble alpha, GLuint max_arc_count = 1000);
@@ -69,7 +71,13 @@ namespace cagd
         GLboolean merge(GLuint index1, Direction direction1, GLuint index2, Direction direction2);
         GLboolean erease(GLuint index);
         GLboolean continueExistingArc(GLuint index, Direction direction);
-//        GLboolean manipulateCurve(Gluint index, DCoordinate3 )
+
+        GLuint getCurveCount();
+        DCoordinate3 getPoint(GLuint curveIndex, GLuint controlPointIndex);
+        GLboolean updateCurve(GLuint curveIndex, GLuint controlPointIndex, DCoordinate3 value);
+        GLboolean renderClickable(GLboolean withNames);
+        GLboolean setSelected(GLuint index, GLboolean value);
+        //        GLboolean manipulateCurve(Gluint index, DCoordinate3 )
 
 //            SecondOrderHyperbolicArc* getArc(GLint pos);
 //            GLboolean insertIsolatedArc(GLint pos_x, GLint pos_y, GLfloat size);

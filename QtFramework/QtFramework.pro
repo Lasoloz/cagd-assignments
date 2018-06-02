@@ -97,4 +97,4 @@ SOURCES += \
     Hyperbolic/SecondOrderHyperbolicCompositeCurve.cpp \
     Hyperbolic/SecondOrderHyperbolicCompositeSurface.cpp
 
-#CONFIG += console
+CONFIG += console

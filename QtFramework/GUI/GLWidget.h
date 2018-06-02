@@ -17,6 +17,7 @@
 
 #include <string>
 #include <QTimer>
+#include <QWheelEvent>
 
 #include "../Cyclic/CyclicCurves3.h"
 
@@ -111,6 +112,14 @@ namespace cagd
 //        GenericCurve3               *_img_arc;
         SecondOrderHyperbolicCompositeCurve* _composite;
 
+        GLuint               _row_count, _column_count;
+        Matrix<DCoordinate3> _positions;
+
+        GLboolean            _named_object_clicked;
+        GLuint                _row;
+        GLuint                _column;
+        GLdouble             _reposition_unit;
+
 
 //        GenericCurve3* initHyperbolicArc(SecondOrderHyperbolicArc*& arc);
 //        void renderHyperbolicArc(SecondOrderHyperbolicArc* arc, GenericCurve3* img_arc);
@@ -123,6 +132,9 @@ namespace cagd
         void initializeGL();
         void paintGL();
         void resizeGL(int w, int h);
+
+        void mousePressEvent(QMouseEvent *event);
+        void wheelEvent(QWheelEvent *event);
 
         virtual ~GLWidget();
 
@@ -139,13 +151,6 @@ namespace cagd
         void set_trans_z(double value);
 
         // your other declarations
-        void set_firstOrderDerivativeEnabled(bool value);
-        void set_secondOrderDerivativeEnabled(bool value);
-
-        void init_cyclic_curve(bool value);
-        void init_interpolating_cyclic_curve(bool value);
-
-        void set_control_polygon(bool value);
         void set_off_model_selected(bool value);
 
         void animate();
@@ -166,5 +171,13 @@ namespace cagd
         void set_scale_factor(double value);
         void set_smoothing(double value);
         void set_shading(double value);
+
+        void set_firstOrderDerivative(bool value);
+        void set_control_polygon(bool value);
+        void set_control_points(bool value);
+        void set_curve_image(bool value);
+
+        void insert_isolated_arc();
+        void remove_arc();
     };
 }

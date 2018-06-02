@@ -259,54 +259,25 @@
      <property name="title">
       <string>Curves</string>
      </property>
-     <widget class="QRadioButton" name="cyclicCurvesRButton">
+     <widget class="QCheckBox" name="controlPolygon">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>81</width>
+        <x>140</x>
+        <y>50</y>
+        <width>131</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
-       <string>Cyclic curve</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="interpolatingCurveRButton">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>40</y>
-        <width>141</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Interpolating cyclic curve</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="checkBox">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>110</y>
-        <width>81</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>showPoligon</string>
+       <string>Control polygon</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="firstOrderDerivatives">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>70</y>
-        <width>141</width>
+        <x>140</x>
+        <y>30</y>
+        <width>131</width>
         <height>17</height>
        </rect>
       </property>
@@ -314,17 +285,85 @@
        <string>First order derivatives</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="secondOrderDerivatives">
+     <widget class="QPushButton" name="insertNewArcButton">
       <property name="geometry">
        <rect>
-        <x>90</x>
+        <x>10</x>
+        <y>30</y>
+        <width>101</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Insert new arc</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="joinArcsButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>101</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Join</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="mergeArcsButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
         <y>90</y>
-        <width>151</width>
+        <width>101</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Merge</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="ereaseArcButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>120</y>
+        <width>101</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remove</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="controlPoints">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>70</y>
+        <width>131</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
-       <string>Second order derivatives</string>
+       <string>Control points</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="curveImage">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>90</y>
+        <width>131</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Curve image</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>
