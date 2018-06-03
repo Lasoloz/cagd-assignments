@@ -21,11 +21,12 @@ private:
 public:
     SecondOrderHyperbolicCompositeSurface();
 
+    void add(SecondOrderHyperbolicPatch *patch_taken);
     bool join(SurfaceId olderSurfaceId, SecondOrderHyperbolicPatch *patch_taken,
               CompositeSurfaceElement::Direction olderDirection,
               CompositeSurfaceElement::Direction newerDirection);
 
-    void updateVBOs();
+    bool updateVBOs(GLuint minDivU, GLuint minDivV);
     void renderSurface();
 };
 

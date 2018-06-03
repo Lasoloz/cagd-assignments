@@ -45,8 +45,8 @@ public:
     CompositeSurfaceElement(SecondOrderHyperbolicPatch *);
     ~CompositeSurfaceElement();
 
-    CompositeSurfaceElement(const CompositeSurfaceElement &);
-    CompositeSurfaceElement &operator=(CompositeSurfaceElement &);
+    CompositeSurfaceElement(const CompositeSurfaceElement &) = delete;
+    CompositeSurfaceElement &operator=(CompositeSurfaceElement &) = delete;
 
     CompositeSurfaceElement(CompositeSurfaceElement &&);
     CompositeSurfaceElement &operator=(CompositeSurfaceElement &&);
@@ -56,7 +56,7 @@ public:
     void joinWith(Direction, Direction, CompositeSurfaceElement *);
     void splitFrom(Direction);
 
-    bool updateVBOs();
+    bool updateVBOs(GLuint, GLuint);
     void renderMesh();
 
     SecondOrderHyperbolicPatch *releaseOwnSurface();

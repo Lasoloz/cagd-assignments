@@ -188,7 +188,8 @@ void GLWidget::initializeGL()
 
         //            initHyperbolicSurface();
         //            _surfaceSelected = true;
-        _img_arc = initHyperbolicArc(_arc);
+        //        _img_arc = initHyperbolicArc(_arc);
+        initCompSurface();
     } catch (Exception &e) {
         cout << e << endl;
     }
@@ -292,7 +293,12 @@ void GLWidget::paintGL()
     // render your geometry (this is oldest OpenGL rendering technique, later we
     // will use some advanced methods)
 
-    renderHyperbolicArc(_arc, _img_arc);
+    //    renderHyperbolicArc(_arc, _img_arc);
+
+    MatFBRuby.Apply();
+    _shader.Enable();
+    _comp_surface.renderSurface();
+    _shader.Disable();
     //            if (_interpolating_cyclic_curve || _cyclic_curve)
     //            {
     //                paintCyclicCurve();
@@ -577,6 +583,31 @@ void GLWidget::initHyperbolicSurface()
     }
 
     _radius = 0.05;
+}
+
+
+
+void GLWidget::initCompSurface()
+{
+    SecondOrderHyperbolicPatch *patchPtr;
+    patchPtr = new SecondOrderHyperbolicPatch(1.0);
+
+    for (GLuint i = 0; i < 4; ++i) {
+        for (GLuint j = 0; j < 4; ++j) {
+            GLdouble r = (GLdouble)i + 1.0;
+            GLdouble p = (GLdouble)j / 3.0 * PI;
+            patchPtr->SetData(
+                i, j, DCoordinate3(r * cos(p), r * sin(p), sin(i + j * j * i)));
+        }
+    }
+
+    _comp_surface.add(patchPtr);
+
+    if (!_comp_surface.updateVBOs(100, 100)) {
+        throw Exception("Failed to update VBOs of composite surface");
+    }
+
+
 }
 
 //----------------------------------------------------------------------------
