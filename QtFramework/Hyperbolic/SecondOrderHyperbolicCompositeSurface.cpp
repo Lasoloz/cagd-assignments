@@ -7,7 +7,8 @@ SecondOrderHyperbolicCompositeSurface::SecondOrderHyperbolicCompositeSurface()
 {}
 
 
-void SecondOrderHyperbolicCompositeSurface::add(
+SecondOrderHyperbolicCompositeSurface::SurfaceId
+SecondOrderHyperbolicCompositeSurface::add(
     SecondOrderHyperbolicPatch *patch_taken)
 {
     SurfaceId id = _current_id++;
@@ -32,6 +33,15 @@ bool SecondOrderHyperbolicCompositeSurface::join(
         .joinWith(olderDirection, newerDirection, &insertedPatch);
 
     return true;
+}
+
+void SecondOrderHyperbolicCompositeSurface::join(
+    SurfaceId surfaceIdA, SurfaceId surfaceIdB,
+    CompositeSurfaceElement::Direction directionA,
+    CompositeSurfaceElement::Direction directionB)
+{
+    _patches.at(surfaceIdA)
+        .joinWith(directionA, directionB, &_patches.at(surfaceIdB));
 }
 
 bool SecondOrderHyperbolicCompositeSurface::updateVBOs(GLuint minDivU,

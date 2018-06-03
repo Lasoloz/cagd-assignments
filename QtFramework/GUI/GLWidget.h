@@ -109,7 +109,7 @@ private:
     GenericCurve3 *           _img_arc;
 
     SecondOrderHyperbolicCompositeSurface _comp_surface;
-    void                                  initCompSurface();
+    void                                  initTestCompSurface();
 
     GenericCurve3 *initHyperbolicArc(SecondOrderHyperbolicArc *&arc);
     void           renderHyperbolicArc(SecondOrderHyperbolicArc *arc,

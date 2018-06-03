@@ -192,15 +192,15 @@ void CompositeSurfaceElement::forceJoinCondition(Direction direction)
         for (int i = 0; i < 4; ++i) {
             GLdouble x, y, z;
             thisPatchPtr->GetData(thisStartX, thisStartY, x, y, z);
-            otherPatchPtr->SetData(otherDeltaX, otherDeltaY, x, y, z);
+            otherPatchPtr->SetData(otherStartX, otherStartY, x, y, z);
 
             GLdouble x1, y1, z1;
             thisPatchPtr->GetData(thisStartX + thisInnerDeltaX,
-                                  thisStartY + thisInnerDeltaY, x, y, z);
+                                  thisStartY + thisInnerDeltaY, x1, y1, z1);
 
             x1 = 2 * x - x1;
             y1 = 2 * y - y1;
-            z1 = 2 * z - x1;
+            z1 = 2 * z - z1;
             otherPatchPtr->SetData(otherStartX + otherInnerDeltaX,
                                    otherStartY + otherInnerDeltaY, x1, y1, z1);
 
@@ -226,10 +226,13 @@ void CompositeSurfaceElement::joinWith(Direction                direction,
     ++_use_count;
 
     neighbor->splitFrom(otherDirection);
-    neighbor->_neighbors[otherDirection] = this;
+    neighbor->_neighbors[otherDirection]                = this;
+    neighbor->_neighbor_back_references[otherDirection] = direction;
     neighbor->_use_count += 1;
 
-    _neighbor_back_references[otherDirection];
+    _neighbor_back_references[direction] = otherDirection;
+
+    forceJoinCondition(direction);
 }
 
 void CompositeSurfaceElement::splitFrom(Direction direction)
@@ -266,10 +269,9 @@ bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
 
 void CompositeSurfaceElement::renderMesh()
 {
-    // TODO: support render modes!
-    if (_surf_image) {
-        _surf_image->Render();
-    }
+    // TODO: support render modes, and maybe support different materials
+    // (Decoupling material and patch specific data from main logic (GLWIDGET))
+    _surf_image->Render();
 }
 
 

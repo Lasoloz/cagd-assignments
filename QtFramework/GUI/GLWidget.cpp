@@ -185,11 +185,19 @@ void GLWidget::initializeGL()
         // ...
         _shader.InstallShaders("Shaders/two_sided_lighting.vert",
                                "Shaders/two_sided_lighting.frag", GL_TRUE);
+        //        _shader.InstallShaders("Shaders/reflection_lines.vert",
+        //                               "Shaders/reflection_lines.frag",
+        //                               GL_TRUE);
+        //        _shader.Enable();
+        //        _shader.SetUniformVariable1f("scale_factor", 4.f);
+        //        _shader.SetUniformVariable1f("smoothing", 1.f);
+        //        _shader.SetUniformVariable1f("shading", 0.5f);
+        //        _shader.Disable();
 
         //            initHyperbolicSurface();
         //            _surfaceSelected = true;
         //        _img_arc = initHyperbolicArc(_arc);
-        initCompSurface();
+        initTestCompSurface();
     } catch (Exception &e) {
         cout << e << endl;
     }
@@ -587,27 +595,45 @@ void GLWidget::initHyperbolicSurface()
 
 
 
-void GLWidget::initCompSurface()
+void GLWidget::initTestCompSurface()
 {
     SecondOrderHyperbolicPatch *patchPtr;
-    patchPtr = new SecondOrderHyperbolicPatch(1.0);
 
-    for (GLuint i = 0; i < 4; ++i) {
-        for (GLuint j = 0; j < 4; ++j) {
-            GLdouble r = (GLdouble)i + 1.0;
-            GLdouble p = (GLdouble)j / 3.0 * PI;
-            patchPtr->SetData(
-                i, j, DCoordinate3(r * cos(p), r * sin(p), sin(i + j * j * i)));
+    for (int row = -2; row <= 2; ++row) {
+        for (int col = -2; col <= 2; ++col) {
+            patchPtr = new SecondOrderHyperbolicPatch(1.0);
+            for (GLuint i = 0; i < 4; ++i) {
+                for (GLuint j = 0; j < 4; ++j) {
+                    GLdouble x = i;
+                    GLdouble y = j;
+                    patchPtr->SetData(i, j,
+                                      DCoordinate3(row * 4 + x, col * 4 + y,
+                                                   sin(x + y + row + col)));
+                }
+            }
+
+            _comp_surface.add(patchPtr);
         }
     }
 
-    _comp_surface.add(patchPtr);
+    _comp_surface.join(6, 7, CompositeSurfaceElement::SOUTH,
+                       CompositeSurfaceElement::NORTH);
+
+    _comp_surface.join(12, 8, CompositeSurfaceElement::SOUTH_WEST,
+                       CompositeSurfaceElement::NORTH_EAST);
+
+    _comp_surface.join(12, 13, CompositeSurfaceElement::SOUTH,
+                       CompositeSurfaceElement::NORTH);
+
+    _comp_surface.join(13, 8, CompositeSurfaceElement::WEST,
+                       CompositeSurfaceElement::EAST);
+
+    _comp_surface.join(24, 19, CompositeSurfaceElement::SOUTH,
+                       CompositeSurfaceElement::SOUTH);
 
     if (!_comp_surface.updateVBOs(100, 100)) {
         throw Exception("Failed to update VBOs of composite surface");
     }
-
-
 }
 
 //----------------------------------------------------------------------------
