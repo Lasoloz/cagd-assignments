@@ -631,6 +631,14 @@ void GLWidget::initTestCompSurface()
     _comp_surface.join(24, 19, CompositeSurfaceElement::SOUTH,
                        CompositeSurfaceElement::SOUTH);
 
+    try {
+        _comp_surface.join(19, 23, CompositeSurfaceElement::EAST,
+                           CompositeSurfaceElement::SOUTH_WEST);
+    } catch (Exception &ex) {
+        std::cout << "If you see this thrown exception, then it is okay: " << ex
+                  << '\n';
+    }
+
     if (!_comp_surface.updateVBOs(100, 100)) {
         throw Exception("Failed to update VBOs of composite surface");
     }
