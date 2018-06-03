@@ -28,6 +28,9 @@ public:
     CalculatePartialDerivatives(GLuint   maximum_order_of_partial_derivatives,
                                 GLdouble u, GLdouble v,
                                 PartialDerivatives &pd) const;
+
+
+    GLdouble getAlphaTension() const;
 };
 
 } // namespace cagd

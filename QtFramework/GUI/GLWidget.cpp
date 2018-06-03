@@ -616,24 +616,30 @@ void GLWidget::initTestCompSurface()
         }
     }
 
-    _comp_surface.join(6, 7, CompositeSurfaceElement::SOUTH,
-                       CompositeSurfaceElement::NORTH);
+    _comp_surface.joinToFirst(6, 7, CompositeSurfaceElement::NORTH,
+                              CompositeSurfaceElement::SOUTH);
 
-    _comp_surface.join(12, 8, CompositeSurfaceElement::SOUTH_WEST,
-                       CompositeSurfaceElement::NORTH_EAST);
+    _comp_surface.joinToFirst(12, 8, CompositeSurfaceElement::NORTH_WEST,
+                              CompositeSurfaceElement::SOUTH_EAST);
 
-    _comp_surface.join(12, 13, CompositeSurfaceElement::SOUTH,
-                       CompositeSurfaceElement::NORTH);
+    _comp_surface.joinToFirst(12, 13, CompositeSurfaceElement::NORTH,
+                              CompositeSurfaceElement::SOUTH);
 
-    _comp_surface.join(13, 8, CompositeSurfaceElement::WEST,
-                       CompositeSurfaceElement::EAST);
+    _comp_surface.joinToFirst(13, 8, CompositeSurfaceElement::WEST,
+                              CompositeSurfaceElement::EAST);
 
-    _comp_surface.join(24, 19, CompositeSurfaceElement::SOUTH,
+    _comp_surface.joinToFirst(24, 19, CompositeSurfaceElement::NORTH,
+                              CompositeSurfaceElement::NORTH);
+
+    _comp_surface.join(16, 21, CompositeSurfaceElement::EAST,
+                       CompositeSurfaceElement::WEST);
+
+    _comp_surface.join(10, 15, CompositeSurfaceElement::SOUTH,
                        CompositeSurfaceElement::SOUTH);
 
     try {
-        _comp_surface.join(19, 23, CompositeSurfaceElement::EAST,
-                           CompositeSurfaceElement::SOUTH_WEST);
+        _comp_surface.joinToFirst(19, 23, CompositeSurfaceElement::EAST,
+                                  CompositeSurfaceElement::SOUTH_WEST);
     } catch (Exception &ex) {
         std::cout << "If you see this thrown exception, then it is okay: " << ex
                   << '\n';

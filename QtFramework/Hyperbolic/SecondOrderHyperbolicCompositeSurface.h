@@ -24,13 +24,19 @@ public:
     SecondOrderHyperbolicCompositeSurface();
 
     SurfaceId add(SecondOrderHyperbolicPatch *patch_taken);
-    bool join(SurfaceId olderSurfaceId, SecondOrderHyperbolicPatch *patch_taken,
-              CompositeSurfaceElement::Direction olderDirection,
-              CompositeSurfaceElement::Direction newerDirection);
 
-    void join(SurfaceId surfaceIdA, SurfaceId surfaceIdB,
+    SurfaceId join(SurfaceId surfaceIdA, SurfaceId surfaceIdB,
               CompositeSurfaceElement::Direction directionA,
               CompositeSurfaceElement::Direction directionB);
+
+    SurfaceId joinToFirst(SurfaceId                          olderSurfaceId,
+                          SecondOrderHyperbolicPatch *       patch_taken,
+                          CompositeSurfaceElement::Direction olderDirection,
+                          CompositeSurfaceElement::Direction newerDirection);
+
+    void joinToFirst(SurfaceId surfaceIdA, SurfaceId surfaceIdB,
+                     CompositeSurfaceElement::Direction directionA,
+                     CompositeSurfaceElement::Direction directionB);
 
     bool updateVBOs(GLuint minDivU, GLuint minDivV);
     void renderSurface();

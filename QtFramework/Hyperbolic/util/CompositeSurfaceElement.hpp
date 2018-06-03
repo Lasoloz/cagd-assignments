@@ -57,10 +57,12 @@ public:
     void splitFrom(Direction);
 
     bool updateVBOs(GLuint, GLuint);
-    void renderMesh();
+    void renderMesh() const;
 
     SecondOrderHyperbolicPatch *releaseOwnSurface();
 
+
+    GLdouble getAlphaTension() const;
 
     friend void swap(CompositeSurfaceElement &, CompositeSurfaceElement &);
 };

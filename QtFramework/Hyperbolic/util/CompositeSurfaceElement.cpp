@@ -82,16 +82,16 @@ void CompositeSurfaceElement::forceJoinCondition(Direction direction)
     // TODO: Remove the lot of code duplication:
     // =========================================
     switch (direction) {
-    case NORTH_WEST:
+    case SOUTH_WEST:
         thisOnePoint    = true;
         thisInnerDeltaX = 1;
-    case NORTH:
+    case SOUTH:
         thisStartX      = 0;
         thisStartY      = 0;
         thisDeltaX      = 1;
         thisInnerDeltaY = 1;
         break;
-    case NORTH_EAST:
+    case SOUTH_EAST:
         thisOnePoint    = true;
         thisInnerDeltaY = 1;
     case EAST:
@@ -100,16 +100,16 @@ void CompositeSurfaceElement::forceJoinCondition(Direction direction)
         thisInnerDeltaX = -1;
         thisDeltaY      = 1;
         break;
-    case SOUTH_EAST:
+    case NORTH_EAST:
         thisOnePoint    = true;
         thisInnerDeltaX = -1;
-    case SOUTH:
+    case NORTH:
         thisStartX      = 3;
         thisStartY      = 3;
         thisDeltaX      = -1;
         thisInnerDeltaY = -1;
         break;
-    case SOUTH_WEST:
+    case NORTH_WEST:
         thisOnePoint    = true;
         thisInnerDeltaY = -1;
     case WEST:
@@ -129,16 +129,16 @@ void CompositeSurfaceElement::forceJoinCondition(Direction direction)
     bool otherOnePoint = false;
 
     switch (otherDirection) {
-    case NORTH_EAST:
+    case SOUTH_EAST:
         otherOnePoint    = true;
         otherInnerDeltaX = -1;
-    case NORTH:
+    case SOUTH:
         otherStartX      = 3;
         otherStartY      = 0;
         otherDeltaX      = -1;
         otherInnerDeltaY = 1;
         break;
-    case SOUTH_EAST:
+    case NORTH_EAST:
         otherOnePoint    = true;
         otherInnerDeltaY = -1;
     case EAST:
@@ -147,16 +147,16 @@ void CompositeSurfaceElement::forceJoinCondition(Direction direction)
         otherInnerDeltaX = -1;
         otherDeltaY      = -1;
         break;
-    case SOUTH_WEST:
+    case NORTH_WEST:
         otherOnePoint    = true;
         otherInnerDeltaX = 1;
-    case SOUTH:
+    case NORTH:
         otherStartX      = 0;
         otherStartY      = 3;
         otherDeltaX      = 1;
         otherInnerDeltaY = -1;
         break;
-    case NORTH_WEST:
+    case SOUTH_WEST:
         otherOnePoint = true;
         otherDeltaY   = 1;
     case WEST:
@@ -267,7 +267,7 @@ bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
     return true;
 }
 
-void CompositeSurfaceElement::renderMesh()
+void CompositeSurfaceElement::renderMesh() const
 {
     // TODO: support render modes, and maybe support different materials
     // (Decoupling material and patch specific data from main logic (GLWIDGET))
@@ -278,6 +278,13 @@ void CompositeSurfaceElement::renderMesh()
 SecondOrderHyperbolicPatch *CompositeSurfaceElement::releaseOwnSurface()
 {
     return _own_surface_ptr.release();
+}
+
+
+
+GLdouble CompositeSurfaceElement::getAlphaTension() const
+{
+    return _own_surface_ptr->getAlphaTension();
 }
 
 

@@ -149,4 +149,7 @@ GLboolean SecondOrderHyperbolicPatch::CalculatePartialDerivatives(
     return GL_TRUE;
 }
 
+
+GLdouble SecondOrderHyperbolicPatch::getAlphaTension() const { return _alpha; }
+
 } // namespace cagd
