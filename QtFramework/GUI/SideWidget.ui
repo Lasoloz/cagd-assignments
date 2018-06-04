@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>313</width>
-    <height>552</height>
+    <height>779</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -220,13 +220,13 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QToolBox" name="toolBox">
+  <widget class="QToolBox" name="customizePage">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>240</y>
      <width>281</width>
-     <height>291</height>
+     <height>281</height>
     </rect>
    </property>
    <property name="autoFillBackground">
@@ -241,7 +241,7 @@
       <x>0</x>
       <y>0</y>
       <width>281</width>
-      <height>210</height>
+      <height>200</height>
      </rect>
     </property>
     <attribute name="label">
@@ -253,7 +253,7 @@
        <x>0</x>
        <y>0</y>
        <width>281</width>
-       <height>211</height>
+       <height>201</height>
       </rect>
      </property>
      <property name="title">
@@ -302,7 +302,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>60</y>
+        <y>90</y>
         <width>101</width>
         <height>23</height>
        </rect>
@@ -315,7 +315,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>90</y>
+        <y>120</y>
         <width>101</width>
         <height>23</height>
        </rect>
@@ -328,7 +328,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>120</y>
+        <y>150</y>
         <width>101</width>
         <height>23</height>
        </rect>
@@ -366,6 +366,22 @@
        <bool>true</bool>
       </property>
      </widget>
+     <widget class="QPushButton" name="continueArcButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>101</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Continue arc</string>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="surfacesPage">
@@ -374,7 +390,7 @@
       <x>0</x>
       <y>0</y>
       <width>281</width>
-      <height>210</height>
+      <height>200</height>
      </rect>
     </property>
     <attribute name="label">
@@ -386,7 +402,7 @@
        <x>0</x>
        <y>0</y>
        <width>281</width>
-       <height>211</height>
+       <height>201</height>
       </rect>
      </property>
      <property name="title">
@@ -574,7 +590,7 @@
       <x>0</x>
       <y>0</y>
       <width>281</width>
-      <height>210</height>
+      <height>200</height>
      </rect>
     </property>
     <attribute name="label">
@@ -753,9 +769,67 @@
     </widget>
    </widget>
   </widget>
+  <widget class="QGroupBox" name="customizeColor">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>530</y>
+     <width>281</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Colors</string>
+   </property>
+   <widget class="QPushButton" name="selectedColorButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>121</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Change selected color</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="selectedArcColorButton">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>20</y>
+      <width>121</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Change color</string>
+    </property>
+   </widget>
+  </widget>
+  <zorder>groupBox</zorder>
+  <zorder>customizeColor</zorder>
+  <zorder>customizePage</zorder>
  </widget>
  <resources/>
  <connections>
+  <connection>
+   <sender>grid</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>gridDivPointCountSpinBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>142</x>
+     <y>396</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>268</x>
+     <y>422</y>
+    </hint>
+   </hints>
+  </connection>
   <connection>
    <sender>loadOFFRButton</sender>
    <signal>toggled(bool)</signal>
@@ -785,22 +859,6 @@
     <hint type="destinationlabel">
      <x>122</x>
      <y>419</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>grid</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>gridDivPointCountSpinBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>142</x>
-     <y>396</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>268</x>
-     <y>422</y>
     </hint>
    </hints>
   </connection>

@@ -37,6 +37,8 @@ namespace cagd{
         _named_object_clicked = GL_FALSE;
         _reposition_unit     = 0.05;
         _row = _column = 1024; // dummy value
+        _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1; // dummy value
+        _join = _merge = GL_FALSE;
 
         _isoLineCount = 10;
         _gridDivPointCount = 10;
@@ -193,10 +195,10 @@ namespace cagd{
                                    "Shaders/two_sided_lighting.frag",
                                    GL_TRUE);
 
-//            initHyperbolicSurface();
-//            _surfaceSelected = true;
             _composite = new (nothrow)SecondOrderHyperbolicCompositeCurve(10);
-            _composite->insertIsolatedArc();
+//            _composite->insertIsolatedArc();
+//            _composite->insertIsolatedArc();
+            _composite->join(0, SecondOrderHyperbolicCompositeCurve::Direction::RIGHT, 1, SecondOrderHyperbolicCompositeCurve::Direction::RIGHT);
         }
         catch (Exception &e)
         {
@@ -620,7 +622,7 @@ namespace cagd{
                 GLuint closest_depth    = pick_buffer[1];
 
 
-                for (GLuint i = 1; i < hit_count; ++i)
+                for (GLint i = 1; i < hit_count; ++i)
                 {
                     GLuint offset = i * 4;
                     if (pick_buffer[offset + 1] < closest_depth)
@@ -630,17 +632,22 @@ namespace cagd{
                     }
                 }
 
-                _composite->setSelected(_row, GL_FALSE);
+                _composite->setSelected(_row, _column, GL_FALSE);
 
                 _row    = closest_selected / 4;
                 _column = closest_selected % 4;
 
-                _composite->setSelected(_row, GL_TRUE);
+                joinAndMergeHelper();
+
+                _composite->setSelected(_row, _column, GL_TRUE);
 
                 _named_object_clicked = GL_TRUE;
             }
             else
             {
+                _join = _merge = GL_FALSE;
+                _composite->setSelected(_row, _column, GL_FALSE);
+                _row = _composite->getCurveCount() + 1;
                 _named_object_clicked = GL_FALSE;
             }
 
@@ -656,7 +663,7 @@ namespace cagd{
 
         if (_named_object_clicked)
         {
-            DCoordinate3 point = _composite->getPoint(_row, _column);// _positions(_row, _column);
+            DCoordinate3 point = _composite->getPoint(_row, _column);
             GLdouble     &x     = point[0];
             GLdouble     &y     = point[1];
             GLdouble     &z     = point[2];
@@ -681,6 +688,43 @@ namespace cagd{
             _composite->updateCurve(_row, _column, point);
 
             updateGL();
+        }
+    }
+
+    GLvoid GLWidget::joinAndMergeHelper()
+    {
+        if (_join || _merge)
+        {
+            if (_arc1[1] != -1)
+            {
+                _arc2[0] = _row;
+                _arc2[1] = _column;
+
+                if ((_arc1[1] == 0 || _arc1[1] == 3) && (_arc2[1] == 0 || _arc2[1] == 3))
+                {
+                    SecondOrderHyperbolicCompositeCurve::Direction dir1, dir2;
+
+                    if (_arc1[1] == 0)
+                        dir1 = SecondOrderHyperbolicCompositeCurve::Direction::LEFT;
+                    else if (_arc1[1] == 3)
+                        dir1 = SecondOrderHyperbolicCompositeCurve::Direction::RIGHT;
+
+                    if (_arc2[1] == 0)
+                        dir2 = SecondOrderHyperbolicCompositeCurve::Direction::LEFT;
+                    else if (_arc2[1] == 3)
+                        dir2 = SecondOrderHyperbolicCompositeCurve::Direction::RIGHT;
+
+                    _join ? _composite->join(_arc1[0], dir1, _arc2[0], dir2) : _composite->merge(_arc1[0], dir1, _arc2[0], dir2);
+                }
+
+                _join = _merge = GL_FALSE;
+                _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1;
+            }
+            else
+            {
+                _arc1[0] = _row;
+                _arc1[1] = _column;
+            }
         }
     }
 
@@ -951,6 +995,46 @@ namespace cagd{
     void GLWidget::remove_arc()
     {
         _composite->erease(_row);
+        _row = _composite->getCurveCount() + 1;
         updateGL();
+    }
+
+    void GLWidget::continue_arc()
+    {
+        if (_column == 3 || _column == 0)
+        {
+            _composite->continueExistingArc(_row, _column == 3 ? SecondOrderHyperbolicCompositeCurve::Direction::RIGHT : SecondOrderHyperbolicCompositeCurve::Direction::LEFT);
+            updateGL();
+        }
+    }
+
+    void GLWidget::change_selected_color()
+    {
+        QColor color = QColorDialog::getColor(Qt::red, this);
+        if (color.isValid())
+            _composite->setSelectedColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
+        updateGL();
+    }
+
+    void GLWidget::change_selected_arcs_color()
+    {
+        QColor color = QColorDialog::getColor(Qt::red, this);
+        if (color.isValid())
+            _composite->setCurveColor(_row, _column, color.redF(), color.greenF(), color.blueF(), color.alphaF());
+         updateGL();
+    }
+
+    void GLWidget::join_arcs()
+    {
+        _merge = GL_FALSE;
+        _join = GL_TRUE;
+        _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1;
+    }
+
+    void GLWidget::merge_arcs()
+    {
+        _join = GL_FALSE;
+        _merge = GL_TRUE;
+        _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1;
     }
 }

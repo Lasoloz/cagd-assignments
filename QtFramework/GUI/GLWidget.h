@@ -120,6 +120,12 @@ namespace cagd
         GLuint                _column;
         GLdouble             _reposition_unit;
 
+        GLvoid joinAndMergeHelper();
+        GLboolean            _join;
+        GLboolean            _merge;
+        GLint                _arc1[2];
+        GLint                _arc2[2];
+
 
 //        GenericCurve3* initHyperbolicArc(SecondOrderHyperbolicArc*& arc);
 //        void renderHyperbolicArc(SecondOrderHyperbolicArc* arc, GenericCurve3* img_arc);
@@ -179,5 +185,10 @@ namespace cagd
 
         void insert_isolated_arc();
         void remove_arc();
+        void continue_arc();
+        void change_selected_color();
+        void change_selected_arcs_color();
+        void join_arcs();
+        void merge_arcs();
     };
 }

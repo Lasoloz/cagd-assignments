@@ -79,6 +79,11 @@ namespace cagd
 
         connect(_side_widget->insertNewArcButton, SIGNAL(pressed()), _gl_widget, SLOT(insert_isolated_arc()));
         connect(_side_widget->ereaseArcButton, SIGNAL(pressed()), _gl_widget, SLOT(remove_arc()));
+        connect(_side_widget->continueArcButton, SIGNAL(pressed()), _gl_widget, SLOT(continue_arc()));
+        connect(_side_widget->selectedArcColorButton, SIGNAL(pressed()), _gl_widget, SLOT(change_selected_arcs_color()));
+        connect(_side_widget->selectedColorButton, SIGNAL(pressed()), _gl_widget, SLOT(change_selected_color()));
+        connect(_side_widget->joinArcsButton, SIGNAL(pressed()), _gl_widget, SLOT(join_arcs()));
+        connect(_side_widget->mergeArcsButton, SIGNAL(pressed()), _gl_widget, SLOT(merge_arcs()));
     }
 
     //--------------------------------
