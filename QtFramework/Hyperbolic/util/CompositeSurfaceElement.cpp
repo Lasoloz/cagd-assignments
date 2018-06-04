@@ -66,10 +66,11 @@ CompositeSurfaceElement &CompositeSurfaceElement::
 //     v |    |    |    | v
 //       + -- + -- + -- +
 //          <- SOUTH =>
-void CompositeSurfaceElement::forceJoinCondition(Direction direction)
+void CompositeSurfaceElement::forceBorderCondition(Direction direction,
+                                                   evaluator eval)
 {
-    auto &thisPatchPtr  = _own_surface_ptr;
-    auto &otherPatchPtr = _neighbors[direction]->_own_surface_ptr;
+    auto &patchPtrThis  = _own_surface_ptr;
+    auto &patchPtrOther = _neighbors[direction]->_own_surface_ptr;
 
     Direction otherDirection = _neighbor_back_references[direction];
 
@@ -175,35 +176,18 @@ void CompositeSurfaceElement::forceJoinCondition(Direction direction)
     }
 
     if (thisOnePoint) {
-        GLdouble x, y, z;
-        thisPatchPtr->GetData(thisStartX, thisStartY, x, y, z);
-        otherPatchPtr->SetData(otherStartX, otherStartY, x, y, z);
-
-        GLdouble x1, y1, z1;
-        thisPatchPtr->GetData(thisStartX + thisInnerDeltaX,
-                              thisStartY + thisInnerDeltaY, x1, y1, z1);
-
-        x1 = 2 * x - x1;
-        y1 = 2 * y - y1;
-        z1 = 2 * z - z1;
-        otherPatchPtr->SetData(otherStartX + otherInnerDeltaX,
-                               otherStartY + otherInnerDeltaY, x1, y1, z1);
+        eval(patchPtrThis, thisStartX, thisStartY, thisStartX + thisInnerDeltaX,
+             thisStartY + thisInnerDeltaY, patchPtrOther, otherStartX,
+             otherStartY, otherStartX + otherDeltaX, otherStartY + otherDeltaY);
     } else {
         for (int i = 0; i < 4; ++i) {
-            GLdouble x, y, z;
-            thisPatchPtr->GetData(thisStartX, thisStartY, x, y, z);
-            otherPatchPtr->SetData(otherStartX, otherStartY, x, y, z);
+            eval(patchPtrThis, thisStartX, thisStartY,
+                 thisStartX + thisInnerDeltaX, thisStartY + thisInnerDeltaY,
+                 patchPtrOther, otherStartX, otherStartY,
+                 otherStartX + otherInnerDeltaX,
+                 otherStartY + otherInnerDeltaY);
 
-            GLdouble x1, y1, z1;
-            thisPatchPtr->GetData(thisStartX + thisInnerDeltaX,
-                                  thisStartY + thisInnerDeltaY, x1, y1, z1);
-
-            x1 = 2 * x - x1;
-            y1 = 2 * y - y1;
-            z1 = 2 * z - z1;
-            otherPatchPtr->SetData(otherStartX + otherInnerDeltaX,
-                                   otherStartY + otherInnerDeltaY, x1, y1, z1);
-
+            // Iterate:
             thisStartX += thisDeltaX;
             thisStartY += thisDeltaY;
             otherStartX += otherDeltaX;
@@ -216,6 +200,8 @@ void CompositeSurfaceElement::forceJoinCondition(Direction direction)
 
 // Public methods:
 // ===============
+// Join methods:
+// =============
 void CompositeSurfaceElement::joinWith(Direction                direction,
                                        Direction                otherDirection,
                                        CompositeSurfaceElement *neighbor)
@@ -232,7 +218,23 @@ void CompositeSurfaceElement::joinWith(Direction                direction,
 
     _neighbor_back_references[direction] = otherDirection;
 
-    forceJoinCondition(direction);
+    forceBorderCondition(
+        direction, [](std::unique_ptr<SecondOrderHyperbolicPatch> &firstPatch,
+                      GLuint x1t, GLuint y1t, GLuint x2t, GLuint y2t,
+                      std::unique_ptr<SecondOrderHyperbolicPatch> &secondPatch,
+                      GLuint x1o, GLuint y1o, GLuint x2o, GLuint y2o) {
+            DCoordinate3 pThis;
+            // Border
+            firstPatch->GetData(x1t, y1t, pThis);
+            secondPatch->SetData(x1o, y1o, pThis);
+
+            // Inner:
+            DCoordinate3 pOther;
+            firstPatch->GetData(x2t, y2t, pOther);
+            pOther = 2 * pThis - pOther;
+
+            secondPatch->SetData(x2o, y2o, pOther);
+        });
 }
 
 void CompositeSurfaceElement::splitFrom(Direction direction)
@@ -252,6 +254,61 @@ void CompositeSurfaceElement::splitFrom(Direction direction)
 }
 
 
+// Merge methods:
+// ==============
+CompositeSurfaceElement
+CompositeSurfaceElement::mergeWith(Direction                direction,
+                                   Direction                otherDirection,
+                                   CompositeSurfaceElement *neighbor)
+{
+    splitFrom(direction);
+
+    _neighbors[direction] = neighbor;
+    ++_use_count;
+
+    neighbor->splitFrom(otherDirection);
+    neighbor->_neighbors[otherDirection]                = this;
+    neighbor->_neighbor_back_references[otherDirection] = direction;
+    neighbor->_use_count += 1;
+
+    _neighbor_back_references[direction] = otherDirection;
+
+    forceBorderCondition(
+        direction, [](std::unique_ptr<SecondOrderHyperbolicPatch> &firstPatch,
+                      GLuint x1t, GLuint y1t, GLuint x2t, GLuint y2t,
+                      std::unique_ptr<SecondOrderHyperbolicPatch> &secondPatch,
+                      GLuint x1o, GLuint y1o, GLuint x2o, GLuint y2o) {
+            DCoordinate3 pThis, pOther;
+            // Border
+            firstPatch->GetData(x1t, y1t, pThis);
+            secondPatch->GetData(x1o, y1o, pOther);
+
+            DCoordinate3 middle = 0.5 * (pThis + pOther);
+            firstPatch->SetData(x1t, y1t, middle);
+            secondPatch->SetData(x1o, y1o, middle);
+
+            // Inner:
+            DCoordinate3 pThisSym  = 2 * middle - pThis;
+            DCoordinate3 pOtherSym = 2 * middle - pOther;
+
+            firstPatch->SetData(x2t, y2t, 0.5 * (pThis + pOtherSym));
+            secondPatch->SetData(x2o, y2o, 0.5 * (pOther + pThisSym));
+        });
+}
+
+
+
+// Test methods:
+// =============
+bool CompositeSurfaceElement::isNeighbor(const CompositeSurfaceElement &other,
+                                         Direction directionThis) const
+{
+    return _neighbors[directionThis] == &other;
+}
+
+
+// Render methods:
+// ===============
 bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
 {
     _surf_image.reset(_own_surface_ptr->GenerateImage(divU, divV));
@@ -264,6 +321,10 @@ bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
         return false;
     }
 
+    if (!_own_surface_ptr->UpdateVertexBufferObjectsOfData()) {
+        return false;
+    }
+
     return true;
 }
 
@@ -272,11 +333,18 @@ void CompositeSurfaceElement::renderMesh() const
     // TODO: support render modes, and maybe support different materials
     // (Decoupling material and patch specific data from main logic (GLWIDGET))
     _surf_image->Render();
+
+    _own_surface_ptr->RenderData();
 }
 
 
+// Utility methods:
+// ================
 SecondOrderHyperbolicPatch *CompositeSurfaceElement::releaseOwnSurface()
 {
+    for (int i = 0; i < DIR_COUNT; ++i) {
+        splitFrom(Direction(i));
+    }
     return _own_surface_ptr.release();
 }
 

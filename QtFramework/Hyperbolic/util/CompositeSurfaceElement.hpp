@@ -25,6 +25,12 @@ public:
         DIR_COUNT
     };
 
+    typedef void(evaluator)(std::unique_ptr<SecondOrderHyperbolicPatch> &,
+                            GLuint, GLuint, GLuint, GLuint,
+                            std::unique_ptr<SecondOrderHyperbolicPatch> &,
+                            GLuint, GLuint, GLuint, GLuint);
+
+
 private:
     static double default_tension;
 
@@ -38,7 +44,7 @@ private:
 
 
 
-    void forceJoinCondition(Direction);
+    void forceBorderCondition(Direction, evaluator eval);
 
 public:
     CompositeSurfaceElement();
@@ -53,16 +59,28 @@ public:
 
 
 
+    // Join methods:
     void joinWith(Direction, Direction, CompositeSurfaceElement *);
     void splitFrom(Direction);
 
+    // Merge methods:
+    CompositeSurfaceElement mergeWith(Direction, Direction,
+                                      CompositeSurfaceElement *);
+
+    // Test methods:
+    bool isNeighbor(const CompositeSurfaceElement &other,
+                    Direction                      directionThis) const;
+
+
+    // Render methods:
     bool updateVBOs(GLuint, GLuint);
     void renderMesh() const;
 
+    // Utility methods:
     SecondOrderHyperbolicPatch *releaseOwnSurface();
 
-
     GLdouble getAlphaTension() const;
+
 
     friend void swap(CompositeSurfaceElement &, CompositeSurfaceElement &);
 };

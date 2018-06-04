@@ -637,6 +637,9 @@ void GLWidget::initTestCompSurface()
     _comp_surface.join(10, 15, CompositeSurfaceElement::SOUTH,
                        CompositeSurfaceElement::SOUTH);
 
+    _comp_surface.join(17, 22, CompositeSurfaceElement::EAST,
+                       CompositeSurfaceElement::WEST);
+
     try {
         _comp_surface.joinToFirst(19, 23, CompositeSurfaceElement::EAST,
                                   CompositeSurfaceElement::SOUTH_WEST);

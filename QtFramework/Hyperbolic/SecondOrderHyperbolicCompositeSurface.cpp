@@ -71,6 +71,30 @@ void SecondOrderHyperbolicCompositeSurface::joinToFirst(
         .joinWith(directionA, directionB, &_patches.at(surfaceIdB));
 }
 
+
+bool SecondOrderHyperbolicCompositeSurface::areJoined(
+    SurfaceId surfaceIdA, SurfaceId surfaceIdB,
+    CompositeSurfaceElement::Direction directionA) const
+{
+    auto &testedA = _patches.at(surfaceIdA);
+    auto &testedB = _patches.at(surfaceIdB);
+    return testedA.isNeighbor(testedB, directionA);
+}
+
+
+void SecondOrderHyperbolicCompositeSurface::merge(
+    SurfaceId surfaceIdA, SurfaceId surfaceIdB,
+    CompositeSurfaceElement::Direction directionA,
+    CompositeSurfaceElement::Direction directionB)
+{
+    auto &patchA = _patches.at(surfaceIdA);
+    auto &patchB = _patches.at(surfaceIdB);
+
+    patchA.mergeWith(directionA, directionB, &patchB);
+}
+
+
+
 bool SecondOrderHyperbolicCompositeSurface::updateVBOs(GLuint minDivU,
                                                        GLuint minDivV)
 {
