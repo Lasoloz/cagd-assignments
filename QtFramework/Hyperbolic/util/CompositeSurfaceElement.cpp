@@ -250,16 +250,16 @@ void CompositeSurfaceElement::splitFrom(Direction direction)
     _neighbors[direction]->_use_count -= 1;
 
     _neighbors[direction] = nullptr;
+
     --_use_count;
 }
 
 
 // Merge methods:
 // ==============
-CompositeSurfaceElement
-CompositeSurfaceElement::mergeWith(Direction                direction,
-                                   Direction                otherDirection,
-                                   CompositeSurfaceElement *neighbor)
+void CompositeSurfaceElement::mergeWith(Direction                direction,
+                                        Direction                otherDirection,
+                                        CompositeSurfaceElement *neighbor)
 {
     splitFrom(direction);
 

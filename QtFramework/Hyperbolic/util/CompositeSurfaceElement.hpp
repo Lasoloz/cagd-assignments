@@ -64,7 +64,7 @@ public:
     void splitFrom(Direction);
 
     // Merge methods:
-    CompositeSurfaceElement mergeWith(Direction, Direction,
+    void mergeWith(Direction, Direction,
                                       CompositeSurfaceElement *);
 
     // Test methods:
