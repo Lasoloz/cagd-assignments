@@ -9,6 +9,7 @@
 #include <Hyperbolic/SecondOrderHyperbolicArc.h>
 #include <Hyperbolic/SecondOrderHyperbolicCompositeSurface.h>
 #include <Hyperbolic/SecondOrderHyperbolicPatch.h>
+#include <Hyperbolic/util/CompositeSurfaceProvider.hpp>
 #include <Parametric/ParametricCurves3.h>
 #include <Parametric/ParametricSurfaces3.h>
 #include <QGLFormat>

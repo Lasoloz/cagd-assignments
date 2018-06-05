@@ -299,6 +299,14 @@ void CompositeSurfaceElement::mergeWith(Direction                direction,
 
             firstPatch->SetData(x2t, y2t, 0.5 * (pThis + pOtherSym));
             secondPatch->SetData(x2o, y2o, 0.5 * (pOther + pThisSym));
+
+            // Inner:
+            //            firstPatch->GetData(x2t, y2t, pThis);
+            //            secondPatch->GetData(x2o, y2o, pOther);
+
+            //            DCoordinate3 middle = 0.5 * (pThis + pOther);
+            //            firstPatch->SetData(x1t, y1t, middle);
+            //            secondPatch->SetData(x1o, y1o, middle);
         });
 }
 
@@ -334,13 +342,23 @@ bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
     return true;
 }
 
-void CompositeSurfaceElement::renderMesh() const
+void CompositeSurfaceElement::renderMesh(GLenum flag)
 {
-    // TODO: support render modes, and maybe support different materials
-    // (Decoupling material and patch specific data from main logic (GLWIDGET))
-    _surf_image->Render();
+    _material.Apply();
+    if (_shader) {
+        _shader->Enable();
+        _surf_image->Render(flag);
+        _shader->Disable();
+    } else {
+        _surf_image->Render(flag);
+    }
+}
 
-    _own_surface_ptr->RenderData();
+void CompositeSurfaceElement::renderWireframe(GLenum flag) const
+{
+    glColor3f(_wireframe_red_component, _wireframe_green_component,
+              _wireframe_blue_component);
+    _own_surface_ptr->RenderData(flag);
 }
 
 
@@ -375,6 +393,11 @@ void swap(CompositeSurfaceElement &first, CompositeSurfaceElement &second)
     swap(first._neighbors, second._neighbors);
     swap(first._neighbor_back_references, second._neighbor_back_references);
     swap(first._own_surface_ptr, second._own_surface_ptr);
+    swap(first._shader, second._shader);
+    swap(first._material, second._material);
+    swap(first._wireframe_red_component, second._wireframe_red_component);
+    swap(first._wireframe_green_component, second._wireframe_green_component);
+    swap(first._wireframe_blue_component, second._wireframe_blue_component);
 }
 
 } // namespace cagd

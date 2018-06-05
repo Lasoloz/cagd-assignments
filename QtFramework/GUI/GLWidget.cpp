@@ -303,10 +303,8 @@ void GLWidget::paintGL()
 
     //    renderHyperbolicArc(_arc, _img_arc);
 
-    MatFBRuby.Apply();
-    _shader.Enable();
     _comp_surface.renderSurface();
-    _shader.Disable();
+    _comp_surface.renderWireframe();
     //            if (_interpolating_cyclic_curve || _cyclic_curve)
     //            {
     //                paintCyclicCurve();
@@ -607,7 +605,7 @@ void GLWidget::initTestCompSurface()
                     GLdouble x = i;
                     GLdouble y = j;
                     patchPtr->SetData(i, j,
-                                      DCoordinate3(row * 4 + x, col * 4 + y,
+                                      DCoordinate3(row * 6 + x, col * 6 + y,
                                                    sin(x + y + row + col)));
                 }
             }
@@ -637,8 +635,8 @@ void GLWidget::initTestCompSurface()
     _comp_surface.join(10, 15, CompositeSurfaceElement::SOUTH,
                        CompositeSurfaceElement::SOUTH);
 
-    _comp_surface.join(17, 22, CompositeSurfaceElement::EAST,
-                       CompositeSurfaceElement::WEST);
+    _comp_surface.merge(17, 22, CompositeSurfaceElement::EAST,
+                        CompositeSurfaceElement::WEST);
 
     try {
         _comp_surface.joinToFirst(19, 23, CompositeSurfaceElement::EAST,
@@ -647,6 +645,15 @@ void GLWidget::initTestCompSurface()
         std::cout << "If you see this thrown exception, then it is okay: " << ex
                   << '\n';
     }
+
+    auto shader = std::make_shared<ShaderProgram>();
+    shader->InstallShaders("Shaders/two_sided_lighting.vert",
+                           "Shaders/two_sided_lighting.frag", GL_TRUE);
+
+    _comp_surface.setShaderForAll(shader);
+    _comp_surface.setMaterialForAll(MatFBBrass);
+    auto access = _comp_surface.getProvider(3);
+    access.setMaterial(MatFBEmerald);
 
     if (!_comp_surface.updateVBOs(100, 100)) {
         throw Exception("Failed to update VBOs of composite surface");

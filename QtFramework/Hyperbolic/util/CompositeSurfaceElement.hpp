@@ -14,6 +14,8 @@ namespace cagd {
 class CompositeSurfaceElement
 {
 public:
+    friend class CompositeSurfaceProvider;
+
     enum Direction
     {
         NORTH = 0,
@@ -82,7 +84,8 @@ public:
 
     // Render methods:
     bool updateVBOs(GLuint, GLuint);
-    void renderMesh() const;
+    void renderMesh(GLenum);
+    void renderWireframe(GLenum) const;
 
     // Utility methods:
     SecondOrderHyperbolicPatch *releaseOwnSurface();

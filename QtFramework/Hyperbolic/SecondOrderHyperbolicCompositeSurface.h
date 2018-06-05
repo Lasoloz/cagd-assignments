@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+#include "../Core/ShaderPrograms.h"
 #include "SecondOrderHyperbolicPatch.h"
 #include "util/CompositeSurfaceElement.hpp"
 #include "util/CompositeSurfaceProvider.hpp"
@@ -34,9 +35,9 @@ public:
                           SecondOrderHyperbolicPatch *       patch_taken,
                           CompositeSurfaceElement::Direction olderDirection,
                           CompositeSurfaceElement::Direction newerDirection);
-    void joinToFirst(SurfaceId surfaceIdA, SurfaceId surfaceIdB,
-                     CompositeSurfaceElement::Direction directionA,
-                     CompositeSurfaceElement::Direction directionB);
+    void      joinToFirst(SurfaceId surfaceIdA, SurfaceId surfaceIdB,
+                          CompositeSurfaceElement::Direction directionA,
+                          CompositeSurfaceElement::Direction directionB);
 
     bool areJoined(SurfaceId surfaceIdA, SurfaceId surfaceIdB,
                    CompositeSurfaceElement::Direction directionA) const;
@@ -45,8 +46,11 @@ public:
                CompositeSurfaceElement::Direction directionA,
                CompositeSurfaceElement::Direction directionB);
 
+    void setShaderForAll(std::shared_ptr<ShaderProgram> shader);
+    void setMaterialForAll(Material &material);
     bool updateVBOs(GLuint minDivU, GLuint minDivV);
-    void renderSurface();
+    void renderSurface(GLenum flag = GL_TRIANGLES);
+    void renderWireframe(GLenum flag = GL_LINE_STRIP);
 
     CompositeSurfaceProvider getProvider(SurfaceId id);
 };

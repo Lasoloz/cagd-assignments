@@ -95,6 +95,24 @@ void SecondOrderHyperbolicCompositeSurface::merge(
 
 
 
+void SecondOrderHyperbolicCompositeSurface::setShaderForAll(
+    std::shared_ptr<ShaderProgram> shader)
+{
+    for (auto &patch : _patches) {
+        CompositeSurfaceProvider access(patch.second);
+        access.setShader(shader);
+    }
+}
+
+void SecondOrderHyperbolicCompositeSurface::setMaterialForAll(
+    Material &material)
+{
+    for (auto &patch : _patches) {
+        CompositeSurfaceProvider access(patch.second);
+        access.setMaterial(material);
+    }
+}
+
 bool SecondOrderHyperbolicCompositeSurface::updateVBOs(GLuint minDivU,
                                                        GLuint minDivV)
 {
@@ -107,15 +125,23 @@ bool SecondOrderHyperbolicCompositeSurface::updateVBOs(GLuint minDivU,
     return true;
 }
 
-void SecondOrderHyperbolicCompositeSurface::renderSurface()
-// TODO: Add mode support for wireframes!
+void SecondOrderHyperbolicCompositeSurface::renderSurface(GLenum flag)
 {
     for (auto &patch : _patches) {
-        patch.second.renderMesh();
+        patch.second.renderMesh(flag);
     }
 }
 
-CompositeSurfaceProvider SecondOrderHyperbolicCompositeSurface::getProvider(SurfaceId id) {
+void SecondOrderHyperbolicCompositeSurface::renderWireframe(GLenum flag)
+{
+    for (auto &patch : _patches) {
+        patch.second.renderWireframe(flag);
+    }
+}
+
+CompositeSurfaceProvider
+SecondOrderHyperbolicCompositeSurface::getProvider(SurfaceId id)
+{
     return CompositeSurfaceProvider(_patches.at(id));
 }
 
