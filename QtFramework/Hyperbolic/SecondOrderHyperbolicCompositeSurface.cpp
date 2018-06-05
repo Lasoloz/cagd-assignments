@@ -145,4 +145,9 @@ SecondOrderHyperbolicCompositeSurface::getProvider(SurfaceId id)
     return CompositeSurfaceProvider(_patches.at(id));
 }
 
+size_t SecondOrderHyperbolicCompositeSurface::getPatchCount() const
+{
+    return _patches.size();
+}
+
 } // namespace cagd

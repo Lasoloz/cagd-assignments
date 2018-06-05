@@ -22,9 +22,9 @@ public:
 
     void setShader(std::shared_ptr<ShaderProgram> shader);
     void setMaterial(const Material &material);
-    void setWireframeRedComponent(GLdouble red);
-    void setWireframeGreenComponent(GLdouble green);
-    void setWireframeBlueComponent(GLdouble blue);
+    void setWireframeRedComponent(GLfloat red);
+    void setWireframeGreenComponent(GLfloat green);
+    void setWireframeBlueComponent(GLfloat blue);
 
 private:
     CompositeSurfaceElement &_element;

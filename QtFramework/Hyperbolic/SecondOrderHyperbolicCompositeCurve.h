@@ -4,7 +4,11 @@
 #include "../Core/DCoordinates3.h"
 #include "../Core/GenericCurves3.h"
 #include "../Core/TriangulatedMeshes3.h"
+#include "../Core/Constants.h"
+#include "../Core/Materials.h"
 #include "SecondOrderHyperbolicArc.h"
+
+#include <iostream>
 
 namespace cagd {
 class SecondOrderHyperbolicCompositeCurve

@@ -1,8 +1,4 @@
 #include "SecondOrderHyperbolicCompositeCurve.h"
-#include "../Core/Constants.h"
-#include "../Core/Materials.h"
-
-#include <iostream>
 
 using namespace std;
 

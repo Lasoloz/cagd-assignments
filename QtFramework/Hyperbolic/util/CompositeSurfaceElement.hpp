@@ -49,9 +49,9 @@ private:
     std::shared_ptr<ShaderProgram> _shader;
     Material                       _material;
 
-    GLdouble _wireframe_red_component;
-    GLdouble _wireframe_green_component;
-    GLdouble _wireframe_blue_component;
+    GLfloat _wireframe_red_component;
+    GLfloat _wireframe_green_component;
+    GLfloat _wireframe_blue_component;
 
 
 

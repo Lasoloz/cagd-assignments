@@ -53,6 +53,7 @@ public:
     void renderWireframe(GLenum flag = GL_LINE_STRIP);
 
     CompositeSurfaceProvider getProvider(SurfaceId id);
+    size_t getPatchCount() const;
 };
 
 } // namespace cagd

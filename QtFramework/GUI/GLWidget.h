@@ -48,11 +48,6 @@ private:
 
     GLboolean _firstOrderDerivativeEnabled;
 
-    // sphere for the control polygon
-    TriangulatedMesh3 _sphere;
-    GLdouble          _radius;
-
-
     // Shaders:
     std::shared_ptr<ShaderProgram> _directional_light;
     std::shared_ptr<ShaderProgram> _two_sided_light;
@@ -60,14 +55,14 @@ private:
     std::shared_ptr<ShaderProgram> _reflection_lines;
 
 
-    SecondOrderHyperbolicCompositeCurve * _composite;
+    SecondOrderHyperbolicCompositeCurve * _comp_curve;
     SecondOrderHyperbolicCompositeSurface _comp_surface;
 
 
     // On-screen events:
     GLboolean _named_object_clicked;
-    GLuint    _row;
-    GLuint    _column;
+    GLuint    _primitiveIndex;
+    GLuint    _controlPointIndex;
     GLdouble  _reposition_unit;
 
     GLvoid    joinAndMergeHelper();

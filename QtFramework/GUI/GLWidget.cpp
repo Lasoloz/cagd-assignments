@@ -17,7 +17,7 @@ namespace cagd {
 GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     : QGLWidget(format, parent)
 {
-    _composite          = 0;
+    _comp_curve          = 0;
 
 
     _firstOrderDerivativeEnabled = false;
@@ -26,7 +26,7 @@ GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     _named_object_clicked = GL_FALSE;
     _reposition_unit      = 0.05;
     // Arc helpers:
-    _row = _column = 1024;                          // dummy value
+    _primitiveIndex = _controlPointIndex = 1024;                          // dummy value
     _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1; // dummy value
     _join = _merge = GL_FALSE;
 }
@@ -35,9 +35,9 @@ GLWidget::~GLWidget() { releaseResources(); }
 
 void GLWidget::releaseResources()
 {
-    if (_composite) {
-        delete _composite;
-        _composite = 0;
+    if (_comp_curve) {
+        delete _comp_curve;
+        _comp_curve = 0;
     }
 }
 
@@ -110,7 +110,7 @@ void GLWidget::initializeGL()
         // create and store your geometry in display lists or vertex buffer
         // objects
         // ...
-        _composite = new (nothrow) SecondOrderHyperbolicCompositeCurve(10);
+        _comp_curve = new (nothrow) SecondOrderHyperbolicCompositeCurve(10);
 
     } catch (Exception &e) {
         cout << e << endl;
@@ -139,27 +139,7 @@ void GLWidget::paintGL()
     // render your geometry (this is oldest OpenGL rendering technique, later we
     // will use some advanced methods)
 
-
-    _composite->render();
-    //            if (_interpolating_cyclic_curve || _cyclic_curve)
-    //            {
-    //                paintCyclicCurve();
-    //            }
-    //            else
-    //            {
-    //                if (_off_model)
-    //                {
-    //                    paintModel();
-    //                }
-    //                else
-    //                {
-    //                    if (_surfaceSelected)
-    //                    {
-    //                        paintHyperbolicSurface();
-    //                    }
-    //                }
-    //            }
-
+    _comp_curve->render();
 
     // pops the current matrix stack, replacing the current matrix with the one
     // below it on the stack, i.e., the original model view matrix is restored
@@ -198,7 +178,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         GLint viewport[4];
         glGetIntegerv(GL_VIEWPORT, viewport);
 
-        GLuint  size        = 4 * 4 * _composite->getCurveCount();
+        GLuint  size        = 4 * (4 * _comp_curve->getCurveCount() + 16 * (GLuint)_comp_surface.getPatchCount());
         GLuint *pick_buffer = new GLuint[size];
         glSelectBuffer(size, pick_buffer);
 
@@ -236,7 +216,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         glScalef(_zoom, _zoom, _zoom);
 
         // render only the clickable geometries
-        _composite->renderClickable(true);
+        _comp_curve->renderClickable(true);
 
         glPopMatrix();
 
@@ -260,20 +240,28 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
                 }
             }
 
-            _composite->setSelected(_row, _column, GL_FALSE);
+            _comp_curve->setSelected(_primitiveIndex, _controlPointIndex, GL_FALSE);
 
-            _row    = closest_selected / 4;
-            _column = closest_selected % 4;
+            GLuint curveCount = _comp_curve->getCurveCount() * 4;
+            if (closest_selected < curveCount) {
+                _primitiveIndex    = closest_selected / 4;
+                _controlPointIndex = closest_selected % 4;
+            } else {
+                _primitiveIndex    = (closest_selected - curveCount) / 16;
+                _controlPointIndex = (closest_selected - curveCount) % 16;
+            }
 
-            joinAndMergeHelper();
+            cout << "patch index: " << _primitiveIndex <<
+                    "control pont idex: " << _controlPointIndex << endl;
+//            joinAndMergeHelper();
 
-            _composite->setSelected(_row, _column, GL_TRUE);
+            _comp_curve->setSelected(_primitiveIndex, _controlPointIndex, GL_TRUE);
 
             _named_object_clicked = GL_TRUE;
         } else {
             _join = _merge = GL_FALSE;
-            _composite->setSelected(_row, _column, GL_FALSE);
-            _row                  = _composite->getCurveCount() + 1;
+            _comp_curve->setSelected(_primitiveIndex, _controlPointIndex, GL_FALSE);
+            _primitiveIndex                  = _comp_curve->getCurveCount() + 1;
             _named_object_clicked = GL_FALSE;
         }
 
@@ -288,7 +276,7 @@ void GLWidget::wheelEvent(QWheelEvent *event)
     event->accept();
 
     if (_named_object_clicked) {
-        DCoordinate3 point = _composite->getPoint(_row, _column);
+        DCoordinate3 point = _comp_curve->getPoint(_primitiveIndex, _controlPointIndex);
         GLdouble &   x     = point[0];
         GLdouble &   y     = point[1];
         GLdouble &   z     = point[2];
@@ -307,7 +295,7 @@ void GLWidget::wheelEvent(QWheelEvent *event)
             z += event->delta() / 120.0 * _reposition_unit;
         }
 
-        _composite->updateCurve(_row, _column, point);
+        _comp_curve->updateCurve(_primitiveIndex, _controlPointIndex, point);
 
         updateGL();
     }
@@ -317,8 +305,8 @@ GLvoid GLWidget::joinAndMergeHelper()
 {
     if (_join || _merge) {
         if (_arc1[1] != -1) {
-            _arc2[0] = _row;
-            _arc2[1] = _column;
+            _arc2[0] = _primitiveIndex;
+            _arc2[1] = _controlPointIndex;
 
             if ((_arc1[1] == 0 || _arc1[1] == 3) &&
                 (_arc2[1] == 0 || _arc2[1] == 3)) {
@@ -336,15 +324,15 @@ GLvoid GLWidget::joinAndMergeHelper()
                     dir2 =
                         SecondOrderHyperbolicCompositeCurve::Direction::RIGHT;
 
-                _join ? _composite->join(_arc1[0], dir1, _arc2[0], dir2)
-                      : _composite->merge(_arc1[0], dir1, _arc2[0], dir2);
+                _join ? _comp_curve->join(_arc1[0], dir1, _arc2[0], dir2)
+                      : _comp_curve->merge(_arc1[0], dir1, _arc2[0], dir2);
             }
 
             _join = _merge = GL_FALSE;
             _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1;
         } else {
-            _arc1[0] = _row;
-            _arc1[1] = _column;
+            _arc1[0] = _primitiveIndex;
+            _arc1[1] = _controlPointIndex;
         }
     }
 }
@@ -411,47 +399,46 @@ void GLWidget::set_trans_z(double value)
 
 void GLWidget::set_firstOrderDerivative(bool value)
 {
-    _composite->setRenderFirstOrderDerivatives(value);
+    _comp_curve->setRenderFirstOrderDerivatives(value);
     updateGL();
 }
 
 void GLWidget::set_control_points(bool value)
 {
-    _composite->setRenderControlPoints(value);
+    _comp_curve->setRenderControlPoints(value);
     updateGL();
 }
 
 void GLWidget::set_control_polygon(bool value)
 {
-    _composite->setRenderControlPolygon(value);
+    _comp_curve->setRenderControlPolygon(value);
     updateGL();
 }
 
 void GLWidget::set_curve_image(bool value)
 {
-    _composite->setRenderCurve(value);
+    _comp_curve->setRenderCurve(value);
     updateGL();
 }
 
-
 void GLWidget::insert_isolated_arc()
 {
-    _composite->insertIsolatedArc();
+    _comp_curve->insertIsolatedArc();
     updateGL();
 }
 
 void GLWidget::remove_arc()
 {
-    _composite->erease(_row);
-    _row = _composite->getCurveCount() + 1;
+    _comp_curve->erease(_primitiveIndex);
+    _primitiveIndex = _comp_curve->getCurveCount() + 1;
     updateGL();
 }
 
 void GLWidget::continue_arc()
 {
-    if (_column == 3 || _column == 0) {
-        _composite->continueExistingArc(
-            _row, _column == 3
+    if (_controlPointIndex == 3 || _controlPointIndex == 0) {
+        _comp_curve->continueExistingArc(
+            _primitiveIndex, _controlPointIndex == 3
                       ? SecondOrderHyperbolicCompositeCurve::Direction::RIGHT
                       : SecondOrderHyperbolicCompositeCurve::Direction::LEFT);
         updateGL();
@@ -462,7 +449,7 @@ void GLWidget::change_selected_color()
 {
     QColor color = QColorDialog::getColor(Qt::red, this);
     if (color.isValid())
-        _composite->setSelectedColor(color.redF(), color.greenF(),
+        _comp_curve->setSelectedColor(color.redF(), color.greenF(),
                                      color.blueF(), color.alphaF());
     updateGL();
 }
@@ -471,7 +458,7 @@ void GLWidget::change_selected_arcs_color()
 {
     QColor color = QColorDialog::getColor(Qt::red, this);
     if (color.isValid())
-        _composite->setCurveColor(_row, _column, color.redF(), color.greenF(),
+        _comp_curve->setCurveColor(_primitiveIndex, _controlPointIndex, color.redF(), color.greenF(),
                                   color.blueF(), color.alphaF());
     updateGL();
 }

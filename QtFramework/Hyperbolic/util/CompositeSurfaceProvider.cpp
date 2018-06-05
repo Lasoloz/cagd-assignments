@@ -36,17 +36,17 @@ void CompositeSurfaceProvider::setShader(std::shared_ptr<ShaderProgram> shader)
     _element._shader = shader;
 }
 
-void CompositeSurfaceProvider::setWireframeRedComponent(GLdouble red)
+void CompositeSurfaceProvider::setWireframeRedComponent(GLfloat red)
 {
     _element._wireframe_red_component = red;
 }
 
-void CompositeSurfaceProvider::setWireframeGreenComponent(GLdouble green)
+void CompositeSurfaceProvider::setWireframeGreenComponent(GLfloat green)
 {
     _element._wireframe_green_component = green;
 }
 
-void CompositeSurfaceProvider::setWireframeBlueComponent(GLdouble blue)
+void CompositeSurfaceProvider::setWireframeBlueComponent(GLfloat blue)
 {
     _element._wireframe_blue_component = blue;
 }
