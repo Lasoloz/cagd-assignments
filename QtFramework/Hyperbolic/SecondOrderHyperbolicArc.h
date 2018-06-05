@@ -36,7 +36,7 @@ namespace cagd
     };
 
 
-    std::ostream &operator<<(std::ostream &lhs,
+    inline std::ostream &operator<<(std::ostream &lhs,
                              const SecondOrderHyperbolicArc &rhs)
     {
         lhs << rhs._data.GetRowCount() << " ";
@@ -47,7 +47,7 @@ namespace cagd
         return lhs;
     }
 
-    std::istream &operator>>(std::istream &lhs, SecondOrderHyperbolicArc &rhs)
+    inline std::istream &operator>>(std::istream &lhs, SecondOrderHyperbolicArc &rhs)
     {
         GLuint size;
         lhs >> size;

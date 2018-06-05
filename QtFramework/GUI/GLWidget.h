@@ -117,6 +117,9 @@ public slots:
     void change_selected_arcs_color();
     void join_arcs();
     void merge_arcs();
+
+    void save();
+    void load();
 };
 
 } // namespace cagd

@@ -241,7 +241,7 @@
       <x>0</x>
       <y>0</y>
       <width>281</width>
-      <height>188</height>
+      <height>200</height>
      </rect>
     </property>
     <attribute name="label">
@@ -390,7 +390,7 @@
       <x>0</x>
       <y>0</y>
       <width>281</width>
-      <height>188</height>
+      <height>200</height>
      </rect>
     </property>
     <attribute name="label">
@@ -416,7 +416,7 @@
       <x>0</x>
       <y>0</y>
       <width>281</width>
-      <height>188</height>
+      <height>200</height>
      </rect>
     </property>
     <attribute name="label">
@@ -634,9 +634,37 @@
     </property>
    </widget>
   </widget>
+  <widget class="QPushButton" name="saveButton">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>620</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadButton">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>620</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load</string>
+   </property>
+  </widget>
   <zorder>groupBox</zorder>
   <zorder>customizeColor</zorder>
   <zorder>customizePage</zorder>
+  <zorder>saveButton</zorder>
+  <zorder>loadButton</zorder>
  </widget>
  <resources/>
  <connections/>

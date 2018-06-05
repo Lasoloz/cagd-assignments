@@ -112,13 +112,14 @@ void GLWidget::initializeGL()
         // objects
         // ...
         _comp_curve = new (nothrow) SecondOrderHyperbolicCompositeCurve(10);
-        _comp_curve->insertIsolatedArc();
-        _comp_curve->insertIsolatedArc();
-        _comp_curve->insertIsolatedArc();
-        _comp_curve->insertIsolatedArc();
 
-        ofstream ofile(std::string("saveTry.txt"));
-        ofile << _comp_curve;
+//        _comp_curve->insertIsolatedArc();
+//        _comp_curve->insertIsolatedArc();
+//        _comp_curve->insertIsolatedArc();
+//        _comp_curve->insertIsolatedArc();
+
+//        ofstream ofile(std::string("saveTry.txt"));
+//        ofile << *_comp_curve;
 
     } catch (Exception &e) {
         cout << e << endl;
@@ -186,7 +187,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         GLint viewport[4];
         glGetIntegerv(GL_VIEWPORT, viewport);
 
-        GLuint  size        = 4 * (4 * _comp_curve->getCurveCount() + 16 * (GLuint)_comp_surface.getPatchCount());
+        GLuint  size        = 4 * (4 * _comp_curve->getCurveCount());
         GLuint *pick_buffer = new GLuint[size];
         glSelectBuffer(size, pick_buffer);
 
@@ -249,18 +250,18 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
             }
 
             _comp_curve->setSelected(_primitiveIndex, _controlPointIndex, GL_FALSE);
-            GLuint curveCount = _comp_curve->getCurveCount() * 4;
-            if (closest_selected < curveCount) {
+//            GLuint curveCount = _comp_curve->getCurveCount() * 4;
+//            if (closest_selected < curveCount) {
                 _primitiveIndex    = closest_selected / 4;
                 _controlPointIndex = closest_selected % 4;
-            } else {
-                _primitiveIndex    = (closest_selected - curveCount) / 16;
-                _controlPointIndex = (closest_selected - curveCount) % 16;
-            }
+//            } else {
+//                _primitiveIndex    = (closest_selected - curveCount) / 16;
+//                _controlPointIndex = (closest_selected - curveCount) % 16;
+//            }
 
-            cout << "patch index: " << _primitiveIndex <<
-                    "control pont idex: " << _controlPointIndex << endl;
-//            joinAndMergeHelper();
+//            cout << "patch index: " << _primitiveIndex <<
+//                    "control pont idex: " << _controlPointIndex << endl;
+            joinAndMergeHelper();
 
             _comp_curve->setSelected(_primitiveIndex, _controlPointIndex, GL_TRUE);
 
@@ -482,5 +483,35 @@ void GLWidget::merge_arcs()
     _join    = GL_FALSE;
     _merge   = GL_TRUE;
     _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1;
+}
+
+void GLWidget::save()
+{
+    QString fileName = QFileDialog::getSaveFileName(
+                        this,
+                        tr("Save"),
+                        "./Models/",
+                        "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
+    cout << fileName.toStdString() << endl;
+
+    ofstream ofile(std::string(fileName.toStdString()));
+    if (ofile.good()) {
+        ofile << *_comp_curve;
+    }
+}
+
+void GLWidget::load()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+                            this,
+                            tr("Open"),
+                            "./Models/",
+                            "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
+    cout << fileName.toStdString() << endl;
+
+    fstream f(fileName.toStdString(), ios_base::in);
+    if (f.good()) {
+        f >> *_comp_curve;
+    }
 }
 } // namespace cagd

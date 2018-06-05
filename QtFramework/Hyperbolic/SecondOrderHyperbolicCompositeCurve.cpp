@@ -184,6 +184,7 @@ SecondOrderHyperbolicCompositeCurve::renderClickable(GLboolean withNames)
                     glPushMatrix();
                     glTranslated(cp[0], cp[1], cp[2]);
                     glScaled(_radius, _radius, _radius);
+                    glColor3f(1.f, 1.f, 0.4f);
                     MatFBBrass.Apply();
                     //                        _shader.Enable();
                     _sphere.Render();
@@ -646,6 +647,7 @@ GLboolean SecondOrderHyperbolicCompositeCurve::preserveConstraints(
 
             (*arc.previous->arc)[0] = newValue;
             (*arc.previous->arc)[1] += delta;
+            (*arc.arc)[2] += delta;
         }
 
         if (!arc.previous->arc->UpdateVertexBufferObjectsOfData()) {
@@ -665,7 +667,7 @@ GLboolean SecondOrderHyperbolicCompositeCurve::preserveConstraints(
         if (arc.previous->next == &arc)
             (*arc.previous->arc)[2] = 2 * (*arc.arc)[0] - newValue;
         else
-            (*arc.previous->arc)[2] = 2 * (*arc.arc)[0] - newValue;
+            (*arc.previous->arc)[1] = 2 * (*arc.arc)[0] - newValue;
 
         if (!arc.previous->arc->UpdateVertexBufferObjectsOfData()) {
             throw Exception("Could not update the VBOoD's hyperbolic arc!");
@@ -910,7 +912,7 @@ GLvoid SecondOrderHyperbolicCompositeCurve::setRenderFirstOrderDerivatives(
 std::ostream &operator<<(std::ostream &lhs,
                          const SecondOrderHyperbolicCompositeCurve &rhs)
 {
-    lhs << rhs._alpha << rhs._div_point_count << rhs._attributes.size() << std::endl;
+    lhs << rhs._alpha << " " << rhs._div_point_count << " " << rhs._attributes.size() << std::endl;
     lhs << rhs._selectedColor.r() << " "
         << rhs._selectedColor.g() << " "
         << rhs._selectedColor.b() << " "
