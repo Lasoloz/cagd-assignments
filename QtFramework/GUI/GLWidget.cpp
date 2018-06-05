@@ -16,17 +16,21 @@ namespace cagd {
 //--------------------------------
 GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     : QGLWidget(format, parent)
+    , _alpha_tension(1.0)
+    , _is_patch_vbo_updated(false)
+    , _is_wireframe_shown(false)
+    , _is_control_points_shown(false)
+    , _is_surface_shown(true)
 {
-    _comp_curve          = 0;
+    _comp_curve = 0;
 
 
     _firstOrderDerivativeEnabled = false;
 
     // On-screen helpers:
-    _named_object_clicked = GL_FALSE;
-    _reposition_unit      = 0.05;
+    _reposition_unit = 0.05;
     // Arc helpers:
-    _primitiveIndex = _controlPointIndex = 1024;                          // dummy value
+    _primitiveIndex = _controlPointIndex = 1024;    // dummy value
     _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1; // dummy value
     _join = _merge = GL_FALSE;
 }
@@ -110,7 +114,15 @@ void GLWidget::initializeGL()
         // create and store your geometry in display lists or vertex buffer
         // objects
         // ...
+        _two_sided_light = std::make_shared<ShaderProgram>();
+        _two_sided_light->InstallShaders("Shaders/two_sided_lighting.vert",
+                                         "Shaders/two_sided_lighting.frag",
+                                         GL_TRUE);
         _comp_curve = new (nothrow) SecondOrderHyperbolicCompositeCurve(10);
+
+        _control_point_mesh = std::make_shared<TriangulatedMesh3>();
+        _control_point_mesh->LoadFromOFF("Models/sphere.off", GL_TRUE);
+        _control_point_mesh->UpdateVertexBufferObjects();
 
     } catch (Exception &e) {
         cout << e << endl;
@@ -140,6 +152,21 @@ void GLWidget::paintGL()
     // will use some advanced methods)
 
     _comp_curve->render();
+
+    if (_is_patch_vbo_updated) {
+        if (_is_wireframe_shown) {
+            _comp_surface.renderWireframe();
+        }
+
+        if (_is_surface_shown) {
+            _comp_surface.renderSurface();
+        }
+
+        if (_is_control_points_shown) {
+            _comp_surface.renderControlPoints(_control_point_mesh, false);
+        }
+    }
+
 
     // pops the current matrix stack, replacing the current matrix with the one
     // below it on the stack, i.e., the original model view matrix is restored
@@ -178,7 +205,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         GLint viewport[4];
         glGetIntegerv(GL_VIEWPORT, viewport);
 
-        GLuint  size        = 4 * (4 * _comp_curve->getCurveCount() + 16 * (GLuint)_comp_surface.getPatchCount());
+        GLuint  size        = 4 * (4 * _comp_curve->getCurveCount() +
+                           16 * (GLuint)_comp_surface.getPatchCount());
         GLuint *pick_buffer = new GLuint[size];
         glSelectBuffer(size, pick_buffer);
 
@@ -217,6 +245,9 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
         // render only the clickable geometries
         _comp_curve->renderClickable(true);
+        _comp_surface.renderSurface();
+        _comp_surface.renderWireframe();
+        _comp_surface.renderControlPoints(_control_point_mesh, true);
 
         glPopMatrix();
 
@@ -240,29 +271,38 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
                 }
             }
 
-            _comp_curve->setSelected(_primitiveIndex, _controlPointIndex, GL_FALSE);
-
             GLuint curveCount = _comp_curve->getCurveCount() * 4;
             if (closest_selected < curveCount) {
                 _primitiveIndex    = closest_selected / 4;
                 _controlPointIndex = closest_selected % 4;
+                _selection_type    = SelectionType::CURVE_POINT_SELECTED;
+                _comp_curve->setSelected(_primitiveIndex, _controlPointIndex,
+                                         GL_TRUE);
             } else {
                 _primitiveIndex    = (closest_selected - curveCount) / 16;
                 _controlPointIndex = (closest_selected - curveCount) % 16;
+                try {
+                    _select_access = std::make_shared<CompositeSurfaceProvider>(
+                        _comp_surface.getSelected(_primitiveIndex,
+                                                  _controlPointIndex));
+                    _selection_type = SelectionType::SURFACE_POINT_SELECTED;
+                } catch (Exception ex) {
+                    std::cerr
+                        << "Failed to get selected surface control point: "
+                        << ex;
+                    _selection_type = SelectionType::NO_SELECTION;
+                }
             }
 
-            cout << "patch index: " << _primitiveIndex <<
-                    "control pont idex: " << _controlPointIndex << endl;
-//            joinAndMergeHelper();
-
-            _comp_curve->setSelected(_primitiveIndex, _controlPointIndex, GL_TRUE);
-
-            _named_object_clicked = GL_TRUE;
+            cout << "patch index: " << _primitiveIndex
+                 << "control point index: " << _controlPointIndex << endl;
+            //            joinAndMergeHelper();
         } else {
             _join = _merge = GL_FALSE;
-            _comp_curve->setSelected(_primitiveIndex, _controlPointIndex, GL_FALSE);
-            _primitiveIndex                  = _comp_curve->getCurveCount() + 1;
-            _named_object_clicked = GL_FALSE;
+            _comp_curve->setSelected(_primitiveIndex, _controlPointIndex,
+                                     GL_FALSE);
+            _primitiveIndex = _comp_curve->getCurveCount() + 1;
+            _selection_type = SelectionType::NO_SELECTION;
         }
 
         delete pick_buffer;
@@ -275,27 +315,43 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 {
     event->accept();
 
-    if (_named_object_clicked) {
-        DCoordinate3 point = _comp_curve->getPoint(_primitiveIndex, _controlPointIndex);
-        GLdouble &   x     = point[0];
-        GLdouble &   y     = point[1];
-        GLdouble &   z     = point[2];
+    if (_selection_type != SelectionType::NO_SELECTION) {
+        GLdouble dx = 0.0;
+        GLdouble dy = 0.0;
+        GLdouble dz = 0.0;
 
         // wheel + Ctrl
         if (event->modifiers() & Qt::ControlModifier) {
-            x += event->delta() / 120.0 * _reposition_unit;
+            dx = event->delta() / 120.0 * _reposition_unit;
         }
 
         // wheel + Alt
         if (event->modifiers() & Qt::AltModifier) {
-            y += event->delta() / 120.0 * _reposition_unit;
+            dy = event->delta() / 120.0 * _reposition_unit;
         }
 
         if (event->modifiers() & Qt::ShiftModifier) {
-            z += event->delta() / 120.0 * _reposition_unit;
+            dz = event->delta() / 120.0 * _reposition_unit;
         }
 
-        _comp_curve->updateCurve(_primitiveIndex, _controlPointIndex, point);
+        if (_selection_type == SelectionType::CURVE_POINT_SELECTED) {
+            DCoordinate3 point =
+                _comp_curve->getPoint(_primitiveIndex, _controlPointIndex);
+            point[0] += dx;
+            point[1] += dy;
+            point[2] += dz;
+            _comp_curve->updateCurve(_primitiveIndex, _controlPointIndex,
+                                     point);
+        } else {
+            DCoordinate3 point;
+            _select_access->getSelectedPoint(point);
+            point[0] += dx;
+            point[1] += dy;
+            point[2] += dz;
+            _select_access->setSelectedPoint(point);
+
+            _is_patch_vbo_updated = _comp_surface.updateVBOs(100, 100);
+        }
 
         updateGL();
     }
@@ -438,9 +494,10 @@ void GLWidget::continue_arc()
 {
     if (_controlPointIndex == 3 || _controlPointIndex == 0) {
         _comp_curve->continueExistingArc(
-            _primitiveIndex, _controlPointIndex == 3
-                      ? SecondOrderHyperbolicCompositeCurve::Direction::RIGHT
-                      : SecondOrderHyperbolicCompositeCurve::Direction::LEFT);
+            _primitiveIndex,
+            _controlPointIndex == 3
+                ? SecondOrderHyperbolicCompositeCurve::Direction::RIGHT
+                : SecondOrderHyperbolicCompositeCurve::Direction::LEFT);
         updateGL();
     }
 }
@@ -450,7 +507,7 @@ void GLWidget::change_selected_color()
     QColor color = QColorDialog::getColor(Qt::red, this);
     if (color.isValid())
         _comp_curve->setSelectedColor(color.redF(), color.greenF(),
-                                     color.blueF(), color.alphaF());
+                                      color.blueF(), color.alphaF());
     updateGL();
 }
 
@@ -458,8 +515,9 @@ void GLWidget::change_selected_arcs_color()
 {
     QColor color = QColorDialog::getColor(Qt::red, this);
     if (color.isValid())
-        _comp_curve->setCurveColor(_primitiveIndex, _controlPointIndex, color.redF(), color.greenF(),
-                                  color.blueF(), color.alphaF());
+        _comp_curve->setCurveColor(_primitiveIndex, _controlPointIndex,
+                                   color.redF(), color.greenF(), color.blueF(),
+                                   color.alphaF());
     updateGL();
 }
 
@@ -476,4 +534,47 @@ void GLWidget::merge_arcs()
     _merge   = GL_TRUE;
     _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1;
 }
+
+
+void GLWidget::set_patch_wireframe_shown(bool value)
+{
+    _is_wireframe_shown = value;
+    updateGL();
+}
+
+void GLWidget::set_patch_control_points_shown(bool value)
+{
+    _is_control_points_shown = value;
+    updateGL();
+}
+
+void GLWidget::set_patch_image_shown(bool value) { _is_surface_shown = value; }
+
+void GLWidget::insert_isolated_surface()
+{
+    SecondOrderHyperbolicPatch *patch =
+        new SecondOrderHyperbolicPatch(_alpha_tension);
+
+    for (GLuint row = 0; row < 4; ++row) {
+        for (GLuint col = 0; col < 4; ++col) {
+            patch->SetData(row, col,
+                           DCoordinate3(row * 1.0, col * 1.0, sin(row + col)));
+        }
+    }
+
+    SecondOrderHyperbolicCompositeSurface::SurfaceId id =
+        _comp_surface.add(patch);
+    auto access = _comp_surface.getProvider(id);
+    access.setMaterial(MatFBTurquoise);
+    access.setShader(_two_sided_light);
+
+    // TODO: Don't hardcode div point count!
+    if (_comp_surface.updateVBOs(100, 100)) {
+        _is_patch_vbo_updated = true;
+        updateGL();
+    } else {
+        _is_patch_vbo_updated = false;
+    }
+}
+
 } // namespace cagd

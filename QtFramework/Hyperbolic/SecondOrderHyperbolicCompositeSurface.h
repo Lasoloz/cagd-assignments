@@ -51,8 +51,13 @@ public:
     bool updateVBOs(GLuint minDivU, GLuint minDivV);
     void renderSurface(GLenum flag = GL_TRIANGLES);
     void renderWireframe(GLenum flag = GL_LINE_STRIP);
+    void renderControlPoints(std::shared_ptr<TriangulatedMesh3> pointMesh,
+                             bool                               named) const;
 
     CompositeSurfaceProvider getProvider(SurfaceId id);
+    CompositeSurfaceProvider getSelected(GLuint selectedIndex,
+                                         GLuint pointCount);
+
     size_t getPatchCount() const;
 };
 

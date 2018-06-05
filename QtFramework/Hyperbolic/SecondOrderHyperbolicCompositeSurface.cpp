@@ -139,10 +139,44 @@ void SecondOrderHyperbolicCompositeSurface::renderWireframe(GLenum flag)
     }
 }
 
+void SecondOrderHyperbolicCompositeSurface::renderControlPoints(
+    std::shared_ptr<TriangulatedMesh3> pointMesh, bool named) const
+{
+    if (named) {
+        GLuint startCount = 0;
+        for (auto &patch : _patches) {
+            patch.second.renderControlPoints(pointMesh, startCount);
+
+            startCount += 16;
+        }
+    } else {
+        for (auto &patch : _patches) {
+            patch.second.renderControlPoints(pointMesh);
+        }
+    }
+}
+
+
 CompositeSurfaceProvider
 SecondOrderHyperbolicCompositeSurface::getProvider(SurfaceId id)
 {
     return CompositeSurfaceProvider(_patches.at(id));
+}
+
+CompositeSurfaceProvider
+SecondOrderHyperbolicCompositeSurface::getSelected(GLuint selectedIndex,
+                                                   GLuint pointCount)
+{
+    GLuint index = 0;
+    for (auto &patch : _patches) {
+        if (index == selectedIndex) {
+            CompositeSurfaceProvider access(patch.second, pointCount);
+            return access;
+        }
+        ++index;
+    }
+
+    throw Exception("Surface not found");
 }
 
 size_t SecondOrderHyperbolicCompositeSurface::getPatchCount() const

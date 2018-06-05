@@ -7,6 +7,7 @@ double CompositeSurfaceElement::default_tension = 1.0;
 
 CompositeSurfaceElement::CompositeSurfaceElement()
     : _use_count(0)
+    , _update_needed(true)
     , _wireframe_red_component(1.f)
     , _wireframe_green_component(1.f)
     , _wireframe_blue_component(1.f)
@@ -23,6 +24,7 @@ CompositeSurfaceElement::CompositeSurfaceElement(
     SecondOrderHyperbolicPatch *patch_taken)
     : _use_count(0)
     , _own_surface_ptr(patch_taken)
+    , _update_needed(true)
     , _wireframe_red_component(1.f)
     , _wireframe_green_component(1.f)
     , _wireframe_blue_component(1.f)
@@ -200,6 +202,8 @@ void CompositeSurfaceElement::forceBorderCondition(Direction direction,
             otherStartY += otherDeltaY;
         }
     }
+
+    _update_needed = true;
 }
 
 
@@ -325,18 +329,22 @@ bool CompositeSurfaceElement::isNeighbor(const CompositeSurfaceElement &other,
 // ===============
 bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
 {
-    _surf_image.reset(_own_surface_ptr->GenerateImage(divU, divV));
-    if (!_surf_image) {
-        return false;
-    }
+    if (_update_needed) {
+        _surf_image.reset(_own_surface_ptr->GenerateImage(divU, divV));
+        if (!_surf_image) {
+            return false;
+        }
 
-    if (!_surf_image->UpdateVertexBufferObjects()) {
-        _surf_image.reset();
-        return false;
-    }
+        if (!_surf_image->UpdateVertexBufferObjects()) {
+            _surf_image.reset();
+            return false;
+        }
 
-    if (!_own_surface_ptr->UpdateVertexBufferObjectsOfData()) {
-        return false;
+        if (!_own_surface_ptr->UpdateVertexBufferObjectsOfData()) {
+            return false;
+        }
+
+        _update_needed = false;
     }
 
     return true;
@@ -359,6 +367,49 @@ void CompositeSurfaceElement::renderWireframe(GLenum flag) const
     glColor3f(_wireframe_red_component, _wireframe_green_component,
               _wireframe_blue_component);
     _own_surface_ptr->RenderData(flag);
+}
+
+void CompositeSurfaceElement::renderControlPoints(
+    std::shared_ptr<TriangulatedMesh3> &controlPointMeshPtr) const
+{
+    for (int row = 0; row < 4; ++row) {
+        for (int col = 0; col < 4; ++col) {
+            DCoordinate3 cp;
+            _own_surface_ptr->GetData(row, col, cp);
+
+            glPushMatrix();
+            glTranslated(cp[0], cp[1], cp[2]);
+            glScaled(0.2, 0.2, 0.2);
+
+            MatFBBrass.Apply();
+            controlPointMeshPtr->Render();
+
+            glPopMatrix();
+        }
+    }
+}
+
+void CompositeSurfaceElement::renderControlPoints(
+    std::shared_ptr<TriangulatedMesh3> &controlPointMeshPtr,
+    GLuint                              startNumber) const
+{
+    for (int row = 0; row < 4; ++row) {
+        for (int col = 0; col < 4; ++col) {
+            DCoordinate3 cp;
+            _own_surface_ptr->GetData(row, col, cp);
+
+            glLoadName(startNumber + 4 * row + col);
+
+            glPushMatrix();
+            glTranslated(cp[0], cp[1], cp[2]);
+            glScaled(0.2, 0.2, 0.2);
+
+            MatFBBrass.Apply();
+            controlPointMeshPtr->Render();
+
+            glPopMatrix();
+        }
+    }
 }
 
 

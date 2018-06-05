@@ -15,6 +15,7 @@
 #include <QGLFormat>
 #include <QGLWidget>
 #include <Test/TestFunctions.h>
+#include <util/util.hpp>
 
 #include <QTimer>
 #include <QWheelEvent>
@@ -54,16 +55,30 @@ private:
     std::shared_ptr<ShaderProgram> _toon;
     std::shared_ptr<ShaderProgram> _reflection_lines;
 
+    // Control point mesh:
+    std::shared_ptr<TriangulatedMesh3> _control_point_mesh;
 
+
+    GLdouble                              _alpha_tension;
     SecondOrderHyperbolicCompositeCurve * _comp_curve;
     SecondOrderHyperbolicCompositeSurface _comp_surface;
 
 
+    // Composite variables:
+    bool _is_patch_vbo_updated;
+    bool _is_wireframe_shown;
+    bool _is_control_points_shown;
+    bool _is_surface_shown;
+
+
     // On-screen events:
-    GLboolean _named_object_clicked;
-    GLuint    _primitiveIndex;
-    GLuint    _controlPointIndex;
-    GLdouble  _reposition_unit;
+    SelectionType _selection_type;
+    GLuint        _primitiveIndex;
+    GLuint        _controlPointIndex;
+    GLdouble      _reposition_unit;
+
+    std::shared_ptr<CompositeSurfaceProvider> _select_access;
+
 
     GLvoid    joinAndMergeHelper();
     GLboolean _join;
@@ -117,6 +132,13 @@ public slots:
     void change_selected_arcs_color();
     void join_arcs();
     void merge_arcs();
+
+    // Patch:
+    void set_patch_wireframe_shown(bool value);
+    void set_patch_control_points_shown(bool value);
+    void set_patch_image_shown(bool value);
+
+    void insert_isolated_surface();
 };
 
 } // namespace cagd

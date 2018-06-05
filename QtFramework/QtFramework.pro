@@ -75,7 +75,8 @@ HEADERS += \
     Hyperbolic/SecondOrderHyperbolicCompositeCurve.h \
     Hyperbolic/SecondOrderHyperbolicCompositeSurface.h \
     Hyperbolic/util/CompositeSurfaceElement.hpp \
-    Hyperbolic/util/CompositeSurfaceProvider.hpp
+    Hyperbolic/util/CompositeSurfaceProvider.hpp \
+    util/util.hpp
 
 SOURCES += \
     GUI/GLWidget.cpp \

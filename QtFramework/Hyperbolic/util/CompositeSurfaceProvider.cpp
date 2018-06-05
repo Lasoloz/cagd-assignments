@@ -51,4 +51,28 @@ void CompositeSurfaceProvider::setWireframeBlueComponent(GLfloat blue)
     _element._wireframe_blue_component = blue;
 }
 
+void CompositeSurfaceProvider::getSelectedPoint(DCoordinate3 &point)
+{
+    _element._own_surface_ptr->GetData(_selected_point / 4, _selected_point % 4,
+                                       point);
+}
+void CompositeSurfaceProvider::setSelectedPoint(const DCoordinate3 &point)
+{
+    _element._own_surface_ptr->SetData(_selected_point / 4, _selected_point % 4,
+                                       point);
+    _element._update_needed = true;
+}
+
+void CompositeSurfaceProvider::getPoint(GLuint row, GLuint column,
+                                        DCoordinate3 &point)
+{
+    _element._own_surface_ptr->GetData(row, column, point);
+}
+
+void CompositeSurfaceProvider::setPoint(GLuint row, GLuint column,
+                                        const DCoordinate3 &point)
+{
+    _element._own_surface_ptr->SetData(row, column, point);
+}
+
 } // namespace cagd

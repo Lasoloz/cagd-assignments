@@ -84,6 +84,17 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(join_arcs()));
     connect(_side_widget->mergeArcsButton, SIGNAL(pressed()), _gl_widget,
             SLOT(merge_arcs()));
+
+
+    // Patches:
+    connect(_side_widget->controlPolygonPatch, SIGNAL(toggled(bool)),
+            _gl_widget, SLOT(set_patch_wireframe_shown(bool)));
+    connect(_side_widget->controlPointsPatch, SIGNAL(toggled(bool)), _gl_widget,
+            SLOT(set_patch_control_points_shown(bool)));
+    connect(_side_widget->showSurface, SIGNAL(toggled(bool)), _gl_widget,
+            SLOT(set_patch_image_shown(bool)));
+    connect(_side_widget->insertNewPatchButton, SIGNAL(pressed()), _gl_widget,
+            SLOT(insert_isolated_surface()));
 }
 
 //--------------------------------

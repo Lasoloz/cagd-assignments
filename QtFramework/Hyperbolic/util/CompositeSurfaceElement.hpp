@@ -45,6 +45,7 @@ private:
     std::unique_ptr<SecondOrderHyperbolicPatch>      _own_surface_ptr;
 
     std::unique_ptr<TriangulatedMesh3> _surf_image;
+    bool _update_needed;
 
     std::shared_ptr<ShaderProgram> _shader;
     Material                       _material;
@@ -86,6 +87,9 @@ public:
     bool updateVBOs(GLuint, GLuint);
     void renderMesh(GLenum);
     void renderWireframe(GLenum) const;
+    void renderControlPoints(std::shared_ptr<TriangulatedMesh3> &) const;
+    void renderControlPoints(std::shared_ptr<TriangulatedMesh3> &,
+                             GLuint) const;
 
     // Utility methods:
     SecondOrderHyperbolicPatch *releaseOwnSurface();
