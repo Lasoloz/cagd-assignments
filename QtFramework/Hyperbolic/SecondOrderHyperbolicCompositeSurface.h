@@ -8,6 +8,7 @@
 
 #include "SecondOrderHyperbolicPatch.h"
 #include "util/CompositeSurfaceElement.hpp"
+#include "util/CompositeSurfaceProvider.hpp"
 
 namespace cagd {
 
@@ -46,6 +47,8 @@ public:
 
     bool updateVBOs(GLuint minDivU, GLuint minDivV);
     void renderSurface();
+
+    CompositeSurfaceProvider getProvider(SurfaceId id);
 };
 
 } // namespace cagd

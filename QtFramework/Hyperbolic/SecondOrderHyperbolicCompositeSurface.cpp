@@ -115,4 +115,8 @@ void SecondOrderHyperbolicCompositeSurface::renderSurface()
     }
 }
 
+CompositeSurfaceProvider SecondOrderHyperbolicCompositeSurface::getProvider(SurfaceId id) {
+    return CompositeSurfaceProvider(_patches.at(id));
+}
+
 } // namespace cagd

@@ -74,7 +74,8 @@ HEADERS += \
     Hyperbolic/SecondOrderHyperbolicArc.h \
     Hyperbolic/SecondOrderHyperbolicCompositeCurve.h \
     Hyperbolic/SecondOrderHyperbolicCompositeSurface.h \
-    Hyperbolic/util/CompositeSurfaceElement.hpp
+    Hyperbolic/util/CompositeSurfaceElement.hpp \
+    Hyperbolic/util/CompositeSurfaceProvider.hpp
 
 SOURCES += \
     GUI/GLWidget.cpp \
@@ -97,6 +98,7 @@ SOURCES += \
     Hyperbolic/SecondOrderHyperbolicArc.cpp \
     Hyperbolic/SecondOrderHyperbolicCompositeCurve.cpp \
     Hyperbolic/SecondOrderHyperbolicCompositeSurface.cpp \
-    Hyperbolic/util/CompositeSurfaceElement.cpp
+    Hyperbolic/util/CompositeSurfaceElement.cpp \
+    Hyperbolic/util/CompositeSurfaceProvider.cpp
 
 #CONFIG += console
