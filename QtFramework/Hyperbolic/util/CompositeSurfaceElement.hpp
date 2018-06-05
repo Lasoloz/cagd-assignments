@@ -3,6 +3,8 @@
 #include <array>
 #include <memory>
 
+#include "../../Core/Materials.h"
+#include "../../Core/ShaderPrograms.h"
 #include "../../Core/TriangulatedMeshes3.h"
 #include "../SecondOrderHyperbolicPatch.h"
 
@@ -42,6 +44,13 @@ private:
 
     std::unique_ptr<TriangulatedMesh3> _surf_image;
 
+    std::shared_ptr<ShaderProgram> _shader;
+    Material                       _material;
+
+    GLdouble _wireframe_red_component;
+    GLdouble _wireframe_green_component;
+    GLdouble _wireframe_blue_component;
+
 
 
     void forceBorderCondition(Direction, evaluator eval);
@@ -64,8 +73,7 @@ public:
     void splitFrom(Direction);
 
     // Merge methods:
-    void mergeWith(Direction, Direction,
-                                      CompositeSurfaceElement *);
+    void mergeWith(Direction, Direction, CompositeSurfaceElement *);
 
     // Test methods:
     bool isNeighbor(const CompositeSurfaceElement &other,

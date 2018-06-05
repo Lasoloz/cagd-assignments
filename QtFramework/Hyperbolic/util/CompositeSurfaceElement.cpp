@@ -7,6 +7,9 @@ double CompositeSurfaceElement::default_tension = 1.0;
 
 CompositeSurfaceElement::CompositeSurfaceElement()
     : _use_count(0)
+    , _wireframe_red_component(1.f)
+    , _wireframe_green_component(1.f)
+    , _wireframe_blue_component(1.f)
 {
     _own_surface_ptr.reset(new SecondOrderHyperbolicPatch(
         CompositeSurfaceElement::default_tension));
@@ -20,6 +23,9 @@ CompositeSurfaceElement::CompositeSurfaceElement(
     SecondOrderHyperbolicPatch *patch_taken)
     : _use_count(0)
     , _own_surface_ptr(patch_taken)
+    , _wireframe_red_component(1.f)
+    , _wireframe_green_component(1.f)
+    , _wireframe_blue_component(1.f)
 {
     for (auto &neighbor : _neighbors) {
         neighbor = nullptr;
