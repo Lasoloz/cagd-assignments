@@ -6,6 +6,7 @@
 #include <GL/glu.h>
 
 #include <iostream>
+#include <fstream>
 #include <string>
 
 using namespace std;
@@ -26,7 +27,7 @@ GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     _named_object_clicked = GL_FALSE;
     _reposition_unit      = 0.05;
     // Arc helpers:
-    _primitiveIndex = _controlPointIndex = 1024;                          // dummy value
+    _primitiveIndex = _controlPointIndex = 1024;    // dummy value
     _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1; // dummy value
     _join = _merge = GL_FALSE;
 }
@@ -111,6 +112,13 @@ void GLWidget::initializeGL()
         // objects
         // ...
         _comp_curve = new (nothrow) SecondOrderHyperbolicCompositeCurve(10);
+        _comp_curve->insertIsolatedArc();
+        _comp_curve->insertIsolatedArc();
+        _comp_curve->insertIsolatedArc();
+        _comp_curve->insertIsolatedArc();
+
+        ofstream ofile(std::string("saveTry.txt"));
+        ofile << _comp_curve;
 
     } catch (Exception &e) {
         cout << e << endl;
@@ -241,7 +249,6 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
             }
 
             _comp_curve->setSelected(_primitiveIndex, _controlPointIndex, GL_FALSE);
-
             GLuint curveCount = _comp_curve->getCurveCount() * 4;
             if (closest_selected < curveCount) {
                 _primitiveIndex    = closest_selected / 4;

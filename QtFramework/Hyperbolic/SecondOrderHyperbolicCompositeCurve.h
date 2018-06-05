@@ -9,10 +9,22 @@
 #include "SecondOrderHyperbolicArc.h"
 
 #include <iostream>
+#include <vector>
 
 namespace cagd {
+
+class SecondOrderHyperbolicCompositeCurve;
+
+std::ostream &operator<<(std::ostream &lhs,
+                         const SecondOrderHyperbolicCompositeCurve &rhs);
+std::istream &operator>>(std::istream &lhs, SecondOrderHyperbolicCompositeCurve &rhs);
+
 class SecondOrderHyperbolicCompositeCurve
 {
+    friend std::ostream &cagd::operator<<(std::ostream &lhs,
+                                          const SecondOrderHyperbolicCompositeCurve &rhs);
+    friend std::istream &cagd::operator>>(std::istream &lhs, SecondOrderHyperbolicCompositeCurve &rhs);
+
 public:
     enum Direction
     {
@@ -22,6 +34,11 @@ public:
 
     class ArcAttributes
     {
+        friend std::ostream &operator<<(std::ostream &lhs,
+                                              const SecondOrderHyperbolicCompositeCurve::ArcAttributes &rhs);
+        friend std::istream &operator>>(std::istream &lhs,
+                                              SecondOrderHyperbolicCompositeCurve::ArcAttributes &rhs);
+
     public:
         SecondOrderHyperbolicArc *arc;
         GenericCurve3 *           image;
@@ -94,5 +111,26 @@ public:
                                GLfloat a = 1.0f);
     GLboolean setCurveColor(GLuint index, GLuint controlPoint, GLfloat r,
                             GLfloat g, GLfloat b, GLfloat a = 1.0f);
+
+    friend std::ostream &operator<<(std::ostream &lhs,
+                             const SecondOrderHyperbolicCompositeCurve::ArcAttributes &rhs)
+    {
+        lhs << *rhs.arc << std::endl;
+        lhs << *rhs.image << std::endl;
+        lhs << rhs.color->r() << " " << rhs.color->g() << " " <<
+               rhs.color->b() << " " << rhs.color->a() << " " << std::endl;
+
+        return lhs;
+    }
+
+    friend std::istream &operator>>(std::istream &lhs,
+                             SecondOrderHyperbolicCompositeCurve::ArcAttributes &rhs)
+    {
+        lhs >> *rhs.arc >> *rhs.image;
+        lhs >> rhs.color->r()  >> rhs.color->g() >>
+               rhs.color->b()  >> rhs.color->a();
+
+        return lhs;
+    }
 };
 } // namespace cagd

@@ -5,8 +5,19 @@
 
 namespace cagd
 {
+    class SecondOrderHyperbolicArc;
+    std::ostream &operator<<(std::ostream &lhs,
+                             const SecondOrderHyperbolicArc &rhs);
+    std::istream &operator>>(std::istream &lhs, SecondOrderHyperbolicArc &rhs);
+
+
     class SecondOrderHyperbolicArc: public LinearCombination3
     {
+        friend std::ostream &cagd::operator<<(std::ostream &lhs,
+                                              const SecondOrderHyperbolicArc &rhs);
+        friend std::istream &cagd::operator>>(std::istream &lhs,
+                                              SecondOrderHyperbolicArc &rhs);
+
     protected:
         GLdouble _alpha;
 
@@ -23,4 +34,28 @@ namespace cagd
         GLboolean BlendingFunctionValues(GLdouble u, RowMatrix<GLdouble>& values) const;
         GLboolean CalculateDerivatives(GLuint max_order_of_derivatives, GLdouble u, Derivatives &d) const;
     };
+
+
+    std::ostream &operator<<(std::ostream &lhs,
+                             const SecondOrderHyperbolicArc &rhs)
+    {
+        lhs << rhs._data.GetRowCount() << " ";
+        for (GLuint i = 0; i < rhs._data.GetRowCount(); ++i) {
+            lhs << rhs._data[i][0] << " " << rhs._data[i][1] << " " << rhs._data[i][2] << std::endl;
+        }
+
+        return lhs;
+    }
+
+    std::istream &operator>>(std::istream &lhs, SecondOrderHyperbolicArc &rhs)
+    {
+        GLuint size;
+        lhs >> size;
+
+        for (GLuint i = 0; i < size; ++i) {
+            lhs >> rhs._data[i][0] >> rhs._data[i][1] >> rhs._data[i][2];
+        }
+
+        return lhs;
+    }
 }

@@ -1,22 +1,22 @@
 #pragma once
 
-#include <Core/GenericCurves3.h>
+#include <GL/glew.h>
 #include <Core/Lights.h>
 #include <Core/Materials.h>
+#include <Core/GenericCurves3.h>
 #include <Core/ShaderPrograms.h>
 #include <Core/TriangulatedMeshes3.h>
-#include <GL/glew.h>
 #include <Hyperbolic/SecondOrderHyperbolicArc.h>
 #include <Hyperbolic/SecondOrderHyperbolicCompositeCurve.h>
 #include <Hyperbolic/SecondOrderHyperbolicCompositeSurface.h>
 #include <Hyperbolic/SecondOrderHyperbolicPatch.h>
 #include <Parametric/ParametricCurves3.h>
 #include <Parametric/ParametricSurfaces3.h>
-#include <QGLFormat>
-#include <QGLWidget>
 #include <Test/TestFunctions.h>
 
 #include <QTimer>
+#include <QGLFormat>
+#include <QGLWidget>
 #include <QWheelEvent>
 
 #include <memory>
