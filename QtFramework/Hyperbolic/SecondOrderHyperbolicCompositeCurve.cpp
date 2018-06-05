@@ -700,6 +700,7 @@ namespace cagd
 
                 (*arc.next->arc)[0] = newValue;
                 (*arc.next->arc)[1] += delta;
+                (*arc.arc)[1] += delta;
             }
             else
             {
