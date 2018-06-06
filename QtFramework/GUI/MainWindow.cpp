@@ -101,6 +101,10 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(set_patch_image_shown(bool)));
     connect(_side_widget->insertNewPatchButton, SIGNAL(pressed()), _gl_widget,
             SLOT(insert_isolated_surface()));
+    connect(_side_widget->showNormals, SIGNAL(toggled(bool)), _gl_widget,
+            SLOT(set_normals_shown(bool)));
+    connect(_side_widget->showIsoparametric, SIGNAL(toggled(bool)), _gl_widget,
+            SLOT(set_isoparametric_lines_shown(bool)));
 
     connect(_side_widget->joinPatchButton, SIGNAL(pressed()), _gl_widget,
             SLOT(join()));

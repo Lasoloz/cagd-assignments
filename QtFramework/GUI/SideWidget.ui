@@ -233,7 +233,7 @@
     <bool>false</bool>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="curvesPage">
     <property name="geometry">
@@ -499,7 +499,7 @@
        <string>First order derivatives</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="showSurface">
+     <widget class="QCheckBox" name="showNormals">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -509,10 +509,10 @@
        </rect>
       </property>
       <property name="text">
-       <string>Show surface</string>
+       <string>Show normals</string>
       </property>
       <property name="checked">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="continuePatchButton">
@@ -542,6 +542,38 @@
       </property>
       <property name="text">
        <string>Control polygon</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="showSurface">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>120</y>
+        <width>131</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Show surface</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="showIsoparametric">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>100</y>
+        <width>151</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Show isoparametric lines</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
       </property>
      </widget>
     </widget>

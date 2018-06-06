@@ -123,11 +123,11 @@ void SecondOrderHyperbolicCompositeSurface::setMaterialForAll(
     }
 }
 
-bool SecondOrderHyperbolicCompositeSurface::updateVBOs(GLuint minDivU,
-                                                       GLuint minDivV)
+bool SecondOrderHyperbolicCompositeSurface::updateVBOs(
+    GLuint minDivU, GLuint minDivV, bool updateParametricLines)
 {
     for (auto &patch : _patches) {
-        if (!patch.second.updateVBOs(minDivU, minDivV)) {
+        if (!patch.second.updateVBOs(minDivU, minDivV, updateParametricLines)) {
             return false;
         }
     }
@@ -169,6 +169,13 @@ void SecondOrderHyperbolicCompositeSurface::renderUVParametricLines() const
 {
     for (auto &patch : _patches) {
         patch.second.renderUVParametricLines();
+    }
+}
+
+void SecondOrderHyperbolicCompositeSurface::renderNormals() const
+{
+    for (auto &patch : _patches) {
+        patch.second.renderNormals();
     }
 }
 

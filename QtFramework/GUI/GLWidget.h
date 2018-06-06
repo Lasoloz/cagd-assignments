@@ -74,6 +74,8 @@ private:
     bool _is_wireframe_shown;
     bool _is_control_points_shown;
     bool _is_surface_shown;
+    bool _update_parametric_lines;
+    bool _is_normals_shown;
 
 
     // On-screen events:
@@ -145,6 +147,8 @@ public slots:
     void set_patch_wireframe_shown(bool value);
     void set_patch_control_points_shown(bool value);
     void set_patch_image_shown(bool value);
+    void set_normals_shown(bool value);
+    void set_isoparametric_lines_shown(bool value);
 
     void insert_isolated_surface();
 

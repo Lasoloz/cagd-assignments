@@ -352,7 +352,8 @@ bool CompositeSurfaceElement::isNeighbor(const CompositeSurfaceElement &other,
 
 // Render methods:
 // ===============
-bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
+bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV,
+                                         bool updateParametricLines)
 {
     if (_update_needed || !_surf_image) {
         _surf_image.reset(_own_surface_ptr->GenerateImage(divU, divV));
@@ -369,6 +370,10 @@ bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
             return false;
         }
 
+        _update_needed = false;
+    }
+
+    if (updateParametricLines) {
         RowMatrix<GenericCurve3 *> *uLines =
             _own_surface_ptr->GenerateUIsoparametricLines(10, 1, 100);
         RowMatrix<GenericCurve3 *> *vLines =
@@ -387,8 +392,6 @@ bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
 
         delete uLines;
         delete vLines;
-
-        _update_needed = false;
     }
 
     return true;
@@ -433,11 +436,16 @@ void CompositeSurfaceElement::renderControlPoints(
     }
 }
 
+void CompositeSurfaceElement::renderNormals() const
+{
+    _surf_image->RenderNormals();
+}
+
 void CompositeSurfaceElement::renderUVParametricLines() const
 {
     glColor3f(_wireframe_red_component, _wireframe_green_component,
               _wireframe_blue_component);
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < _u_parametric_lines.size(); ++i) {
         _u_parametric_lines[i]->RenderDerivatives(0, GL_LINE_STRIP);
         _v_parametric_lines[i]->RenderDerivatives(0, GL_LINE_STRIP);
     }

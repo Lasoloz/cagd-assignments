@@ -26,6 +26,8 @@ GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     , _is_control_points_shown(false)
     , _is_surface_shown(true)
     , _selection_type(SelectionType::NO_SELECTION)
+    , _update_parametric_lines(false)
+    ,  _is_normals_shown(false)
 {
     _comp_curve = 0;
 
@@ -164,7 +166,14 @@ void GLWidget::paintGL()
 
         if (_is_surface_shown) {
             _comp_surface.renderSurface();
+        }
+
+        if (_update_parametric_lines) {
             _comp_surface.renderUVParametricLines();
+        }
+
+        if (_is_normals_shown) {
+            _comp_surface.renderNormals();
         }
 
         if (_is_control_points_shown) {
@@ -354,7 +363,8 @@ void GLWidget::wheelEvent(QWheelEvent *event)
             point[2] += dz;
             _select_access->setSelectedPoint(point);
 
-            _is_patch_vbo_updated = _comp_surface.updateVBOs(100, 100);
+            _is_patch_vbo_updated =
+                _comp_surface.updateVBOs(100, 100, _update_parametric_lines);
         }
 
         updateGL();
@@ -423,7 +433,7 @@ GLvoid GLWidget::joinAndMergeHelper()
                     std::cerr << "Failed to join/merge surfaces: " << ex
                               << '\n';
                 }
-                _comp_surface.updateVBOs(100, 100);
+                _comp_surface.updateVBOs(100, 100, _update_parametric_lines);
                 _join = _merge = false;
             }
         }
@@ -599,6 +609,19 @@ void GLWidget::set_patch_control_points_shown(bool value)
 
 void GLWidget::set_patch_image_shown(bool value) { _is_surface_shown = value; }
 
+void GLWidget::set_normals_shown(bool value)
+{
+    _is_normals_shown = value;
+    updateGL();
+}
+
+void GLWidget::set_isoparametric_lines_shown(bool value)
+{
+    _update_parametric_lines = value;
+    _is_surface_shown = _comp_surface.updateVBOs(100, 100, _update_parametric_lines);
+    updateGL();
+}
+
 void GLWidget::insert_isolated_surface()
 {
     SecondOrderHyperbolicPatch *patch =
@@ -624,7 +647,8 @@ void GLWidget::insert_isolated_surface()
     access.setShader(_two_sided_light);
 
     // TODO: Don't hardcode div point count!
-    _is_patch_vbo_updated = _comp_surface.updateVBOs(100, 100);
+    _is_patch_vbo_updated =
+        _comp_surface.updateVBOs(100, 100, _update_parametric_lines);
     updateGL();
 }
 
