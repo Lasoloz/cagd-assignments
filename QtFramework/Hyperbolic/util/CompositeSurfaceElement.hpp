@@ -80,6 +80,9 @@ public:
     // Merge methods:
     void mergeWith(Direction, Direction, CompositeSurfaceElement *);
 
+    // Both:
+    void forceConditions();
+
     // Test methods:
     bool isNeighbor(const CompositeSurfaceElement &other,
                     Direction                      directionThis) const;

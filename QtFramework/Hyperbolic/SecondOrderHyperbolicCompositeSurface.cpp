@@ -37,10 +37,17 @@ CompositeSurfaceElement::SurfaceId SecondOrderHyperbolicCompositeSurface::join(
     SecondOrderHyperbolicPatch *patchBetween =
         new SecondOrderHyperbolicPatch(alphaTension);
 
-    CompositeSurfaceElement::SurfaceId id = joinToFirst(
-        surfaceIdA, patchBetween, directionA, CompositeSurfaceElement::NORTH);
-
-    joinToFirst(surfaceIdB, id, directionB, CompositeSurfaceElement::SOUTH);
+    CompositeSurfaceElement::SurfaceId id;
+    if (directionA % 2) {
+        id = joinToFirst(surfaceIdA, patchBetween, directionA,
+                         CompositeSurfaceElement::NORTH_EAST);
+        joinToFirst(surfaceIdB, id, directionB,
+                    CompositeSurfaceElement::SOUTH_WEST);
+    } else {
+        id = joinToFirst(surfaceIdA, patchBetween, directionA,
+                         CompositeSurfaceElement::NORTH);
+        joinToFirst(surfaceIdB, id, directionB, CompositeSurfaceElement::SOUTH);
+    }
 
     return id;
 }

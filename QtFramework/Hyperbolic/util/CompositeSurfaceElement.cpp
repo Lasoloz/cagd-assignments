@@ -182,6 +182,7 @@ void CompositeSurfaceElement::forceBorderCondition(Direction direction,
 
 
     if (thisOnePoint != otherOnePoint) {
+        std::cerr << thisOnePoint << ", " << otherOnePoint << '\n';
         throw Exception("Cannot join edge with corner");
     }
 
@@ -315,7 +316,27 @@ void CompositeSurfaceElement::mergeWith(Direction                direction,
             //            secondPatch->SetData(x1o, y1o, middle);
         });
 
-    neighbor->_update_needed = true;
+    neighbor->forceConditions();
+}
+
+
+// Both:
+// =====
+void CompositeSurfaceElement::forceConditions()
+{
+    if (!_update_needed) {
+        for (int i = 0; i < DIR_COUNT; ++i) {
+            Direction                dir      = Direction(i);
+            CompositeSurfaceElement *neighbor = _neighbors[dir];
+
+            if (neighbor) {
+                Direction backDir = _neighbor_back_references[dir];
+                joinWith(dir, backDir, neighbor);
+                neighbor->forceConditions();
+            }
+        }
+        _update_needed = true;
+    }
 }
 
 
