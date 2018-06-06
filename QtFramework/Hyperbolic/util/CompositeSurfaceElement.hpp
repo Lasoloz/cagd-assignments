@@ -82,6 +82,9 @@ public:
     // Merge methods:
     void mergeWith(Direction, Direction, CompositeSurfaceElement *);
 
+    // Continue:
+    void continuePatch(CompositeSurfaceElement *, Direction);
+
     // Both:
     void forceConditions();
 

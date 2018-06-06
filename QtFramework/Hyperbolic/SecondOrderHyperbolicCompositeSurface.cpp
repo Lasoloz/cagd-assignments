@@ -79,6 +79,16 @@ void SecondOrderHyperbolicCompositeSurface::joinToFirst(
         .joinWith(directionA, directionB, &_patches.at(surfaceIdB));
 }
 
+void SecondOrderHyperbolicCompositeSurface::continuePatch(
+    CompositeSurfaceElement::SurfaceId which,
+    CompositeSurfaceElement::Direction direction)
+{
+    SecondOrderHyperbolicPatch *patch = new SecondOrderHyperbolicPatch(
+        CompositeSurfaceElement::default_tension);
+
+    _patches.at(which).continuePatch(patch, direction);
+}
+
 
 bool SecondOrderHyperbolicCompositeSurface::areJoined(
     CompositeSurfaceElement::SurfaceId surfaceIdA,

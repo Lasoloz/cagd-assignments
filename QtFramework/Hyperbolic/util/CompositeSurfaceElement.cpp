@@ -320,6 +320,54 @@ void CompositeSurfaceElement::mergeWith(Direction                direction,
 }
 
 
+// Continue:
+// =========
+void CompositeSurfaceElement::continuePatch(CompositeSurfaceElement *patch,
+                                            Direction                direction)
+{
+    splitFrom(direction);
+
+    _neighbors[direction] = neighbor;
+    ++_use_count;
+
+    neighbor->splitFrom(otherDirection);
+    neighbor->_neighbors[otherDirection]                = this;
+    neighbor->_neighbor_back_references[otherDirection] = direction;
+    neighbor->_use_count += 1;
+
+    _neighbor_back_references[direction] = otherDirection;
+
+    forceBorderCondition(
+        direction, [](std::unique_ptr<SecondOrderHyperbolicPatch> &firstPatch,
+                      GLuint x1t, GLuint y1t, GLuint x2t, GLuint y2t,
+                      std::unique_ptr<SecondOrderHyperbolicPatch> &secondPatch,
+                      GLuint x1o, GLuint y1o, GLuint x2o, GLuint y2o) {
+            DCoordinate3 pThisBorder, pThisInner;
+
+            firstPatch->GetData(x1t, y1t, pThisBorder);
+            firstPatch->GetData(x2t, y2t, pThisInner);
+
+            secondPatch->SetData(x1o, y1o, pThisBorder);
+
+            // Get difference:
+            DCoordinate3 delta = pThisBorder - pThisInner;
+
+            // Get step difference:
+            int xDiff = (int)x2o - (int)x1o;
+            int yDiff = (int)y2o - (int)y1o;
+
+
+            for (int i = 0; i < 3; ++i) {
+                x1o = (int)x1o + xDiff;
+                y1o = (int)y1o + yDiff;
+                pThisBorder += delta;
+
+                secondPatch->SetData(x1o, y1o, pThisBorder);
+            }
+        });
+}
+
+
 // Both:
 // =====
 void CompositeSurfaceElement::forceConditions()
