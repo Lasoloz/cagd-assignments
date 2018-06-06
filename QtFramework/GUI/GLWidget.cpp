@@ -296,7 +296,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
             cout << "patch index: " << _primitiveIndex
                  << "control point index: " << _controlPointIndex << endl;
-            //            joinAndMergeHelper();
+            joinAndMergeHelper();
         } else {
             _join = _merge = GL_FALSE;
             _comp_curve->setSelected(_primitiveIndex, _controlPointIndex,
@@ -360,35 +360,41 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 GLvoid GLWidget::joinAndMergeHelper()
 {
     if (_join || _merge) {
-        if (_arc1[1] != -1) {
-            _arc2[0] = _primitiveIndex;
-            _arc2[1] = _controlPointIndex;
+        if (_selection_type == SelectionType::CURVE_POINT_SELECTED) {
+            if (_arc1[1] != -1) {
+                _arc2[0] = _primitiveIndex;
+                _arc2[1] = _controlPointIndex;
 
-            if ((_arc1[1] == 0 || _arc1[1] == 3) &&
-                (_arc2[1] == 0 || _arc2[1] == 3)) {
-                SecondOrderHyperbolicCompositeCurve::Direction dir1, dir2;
+                if ((_arc1[1] == 0 || _arc1[1] == 3) &&
+                    (_arc2[1] == 0 || _arc2[1] == 3)) {
+                    SecondOrderHyperbolicCompositeCurve::Direction dir1, dir2;
 
-                if (_arc1[1] == 0)
-                    dir1 = SecondOrderHyperbolicCompositeCurve::Direction::LEFT;
-                else if (_arc1[1] == 3)
-                    dir1 =
-                        SecondOrderHyperbolicCompositeCurve::Direction::RIGHT;
+                    if (_arc1[1] == 0)
+                        dir1 = SecondOrderHyperbolicCompositeCurve::Direction::
+                            LEFT;
+                    else if (_arc1[1] == 3)
+                        dir1 = SecondOrderHyperbolicCompositeCurve::Direction::
+                            RIGHT;
 
-                if (_arc2[1] == 0)
-                    dir2 = SecondOrderHyperbolicCompositeCurve::Direction::LEFT;
-                else if (_arc2[1] == 3)
-                    dir2 =
-                        SecondOrderHyperbolicCompositeCurve::Direction::RIGHT;
+                    if (_arc2[1] == 0)
+                        dir2 = SecondOrderHyperbolicCompositeCurve::Direction::
+                            LEFT;
+                    else if (_arc2[1] == 3)
+                        dir2 = SecondOrderHyperbolicCompositeCurve::Direction::
+                            RIGHT;
 
-                _join ? _comp_curve->join(_arc1[0], dir1, _arc2[0], dir2)
-                      : _comp_curve->merge(_arc1[0], dir1, _arc2[0], dir2);
+                    _join ? _comp_curve->join(_arc1[0], dir1, _arc2[0], dir2)
+                          : _comp_curve->merge(_arc1[0], dir1, _arc2[0], dir2);
+                }
+
+                _join = _merge = GL_FALSE;
+                _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1;
+            } else {
+                _arc1[0] = _primitiveIndex;
+                _arc1[1] = _controlPointIndex;
             }
-
-            _join = _merge = GL_FALSE;
-            _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1;
-        } else {
-            _arc1[0] = _primitiveIndex;
-            _arc1[1] = _controlPointIndex;
+        } else if (_selection_type == SelectionType::SURFACE_POINT_SELECTED) {
+            // Do join of the surface
         }
     }
 }
