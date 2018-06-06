@@ -7,12 +7,11 @@ SecondOrderHyperbolicCompositeSurface::SecondOrderHyperbolicCompositeSurface()
 {}
 
 
-SecondOrderHyperbolicCompositeSurface::SurfaceId
-SecondOrderHyperbolicCompositeSurface::add(
+CompositeSurfaceElement::SurfaceId SecondOrderHyperbolicCompositeSurface::add(
     SecondOrderHyperbolicPatch *patch_taken)
 {
-    SurfaceId id = _current_id++;
-    auto      inserted =
+    CompositeSurfaceElement::SurfaceId id = _current_id++;
+    auto                               inserted =
         _patches.emplace(id, std::move(CompositeSurfaceElement(patch_taken)));
 
     if (!inserted.second) {
@@ -23,9 +22,9 @@ SecondOrderHyperbolicCompositeSurface::add(
 }
 
 
-SecondOrderHyperbolicCompositeSurface::SurfaceId
-SecondOrderHyperbolicCompositeSurface::join(
-    SurfaceId surfaceIdA, SurfaceId surfaceIdB,
+CompositeSurfaceElement::SurfaceId SecondOrderHyperbolicCompositeSurface::join(
+    CompositeSurfaceElement::SurfaceId surfaceIdA,
+    CompositeSurfaceElement::SurfaceId surfaceIdB,
     CompositeSurfaceElement::Direction directionA,
     CompositeSurfaceElement::Direction directionB)
 {
@@ -38,8 +37,8 @@ SecondOrderHyperbolicCompositeSurface::join(
     SecondOrderHyperbolicPatch *patchBetween =
         new SecondOrderHyperbolicPatch(alphaTension);
 
-    SurfaceId id = joinToFirst(surfaceIdA, patchBetween, directionA,
-                               CompositeSurfaceElement::NORTH);
+    CompositeSurfaceElement::SurfaceId id = joinToFirst(
+        surfaceIdA, patchBetween, directionA, CompositeSurfaceElement::NORTH);
 
     joinToFirst(surfaceIdB, id, directionB, CompositeSurfaceElement::SOUTH);
 
@@ -47,13 +46,14 @@ SecondOrderHyperbolicCompositeSurface::join(
 }
 
 
-SecondOrderHyperbolicCompositeSurface::SurfaceId
+CompositeSurfaceElement::SurfaceId
 SecondOrderHyperbolicCompositeSurface::joinToFirst(
-    SurfaceId olderSurfaceId, SecondOrderHyperbolicPatch *patch_taken,
+    CompositeSurfaceElement::SurfaceId olderSurfaceId,
+    SecondOrderHyperbolicPatch *       patch_taken,
     CompositeSurfaceElement::Direction olderDirection,
     CompositeSurfaceElement::Direction newerDirection)
 {
-    SurfaceId id = add(patch_taken);
+    CompositeSurfaceElement::SurfaceId id = add(patch_taken);
 
     auto &insertedPatch = _patches.at(id);
     _patches.at(olderSurfaceId)
@@ -63,7 +63,8 @@ SecondOrderHyperbolicCompositeSurface::joinToFirst(
 }
 
 void SecondOrderHyperbolicCompositeSurface::joinToFirst(
-    SurfaceId surfaceIdA, SurfaceId surfaceIdB,
+    CompositeSurfaceElement::SurfaceId surfaceIdA,
+    CompositeSurfaceElement::SurfaceId surfaceIdB,
     CompositeSurfaceElement::Direction directionA,
     CompositeSurfaceElement::Direction directionB)
 {
@@ -73,7 +74,8 @@ void SecondOrderHyperbolicCompositeSurface::joinToFirst(
 
 
 bool SecondOrderHyperbolicCompositeSurface::areJoined(
-    SurfaceId surfaceIdA, SurfaceId surfaceIdB,
+    CompositeSurfaceElement::SurfaceId surfaceIdA,
+    CompositeSurfaceElement::SurfaceId surfaceIdB,
     CompositeSurfaceElement::Direction directionA) const
 {
     auto &testedA = _patches.at(surfaceIdA);
@@ -83,7 +85,8 @@ bool SecondOrderHyperbolicCompositeSurface::areJoined(
 
 
 void SecondOrderHyperbolicCompositeSurface::merge(
-    SurfaceId surfaceIdA, SurfaceId surfaceIdB,
+    CompositeSurfaceElement::SurfaceId surfaceIdA,
+    CompositeSurfaceElement::SurfaceId surfaceIdB,
     CompositeSurfaceElement::Direction directionA,
     CompositeSurfaceElement::Direction directionB)
 {
@@ -99,7 +102,7 @@ void SecondOrderHyperbolicCompositeSurface::setShaderForAll(
     std::shared_ptr<ShaderProgram> shader)
 {
     for (auto &patch : _patches) {
-        CompositeSurfaceProvider access(patch.second);
+        CompositeSurfaceProvider access(patch.second, patch.first);
         access.setShader(shader);
     }
 }
@@ -108,7 +111,7 @@ void SecondOrderHyperbolicCompositeSurface::setMaterialForAll(
     Material &material)
 {
     for (auto &patch : _patches) {
-        CompositeSurfaceProvider access(patch.second);
+        CompositeSurfaceProvider access(patch.second, patch.first);
         access.setMaterial(material);
     }
 }
@@ -156,10 +159,10 @@ void SecondOrderHyperbolicCompositeSurface::renderControlPoints(
 }
 
 
-CompositeSurfaceProvider
-SecondOrderHyperbolicCompositeSurface::getProvider(SurfaceId id)
+CompositeSurfaceProvider SecondOrderHyperbolicCompositeSurface::getProvider(
+    CompositeSurfaceElement::SurfaceId id)
 {
-    return CompositeSurfaceProvider(_patches.at(id));
+    return CompositeSurfaceProvider(_patches.at(id), id);
 }
 
 CompositeSurfaceProvider
@@ -169,7 +172,8 @@ SecondOrderHyperbolicCompositeSurface::getSelected(GLuint selectedIndex,
     GLuint index = 0;
     for (auto &patch : _patches) {
         if (index == selectedIndex) {
-            CompositeSurfaceProvider access(patch.second, pointCount);
+            CompositeSurfaceProvider access(patch.second, patch.first,
+                                            pointCount);
             return access;
         }
         ++index;

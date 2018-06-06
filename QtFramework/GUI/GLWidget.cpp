@@ -17,6 +17,9 @@ namespace cagd {
 GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     : QGLWidget(format, parent)
     , _alpha_tension(1.0)
+    , _cursor_x(0.0)
+    , _cursor_y(0.0)
+    , _cursor_z(0.0)
     , _is_patch_vbo_updated(false)
     , _is_wireframe_shown(false)
     , _is_control_points_shown(false)
@@ -280,6 +283,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
                 _primitiveIndex    = (closest_selected - curveControlPointCount) / 16;
                 _controlPointIndex = (closest_selected - curveControlPointCount) % 16;
                 try {
+                    _last_access   = _select_access;
                     _select_access = std::make_shared<CompositeSurfaceProvider>(
                         _comp_surface.getSelected(_primitiveIndex,
                                                   _controlPointIndex));
@@ -299,6 +303,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
                                      GL_FALSE);
             _primitiveIndex = _comp_curve->getCurveCount() + 1;
             _selection_type = SelectionType::NO_SELECTION;
+            _select_access.reset();
+            _last_access.reset();
         }
 
         delete pick_buffer;
@@ -391,6 +397,33 @@ GLvoid GLWidget::joinAndMergeHelper()
             }
         } else if (_selection_type == SelectionType::SURFACE_POINT_SELECTED) {
             // Do join of the surface
+            if (_last_access) {
+                try {
+                    CompositeSurfaceElement::SurfaceId idA =
+                        _select_access->getId();
+                    CompositeSurfaceElement::SurfaceId idB =
+                        _last_access->getId();
+                    CompositeSurfaceElement::Direction dirA =
+                        _select_access->getDirection();
+                    CompositeSurfaceElement::Direction dirB =
+                        _last_access->getDirection();
+
+                    if (_join) {
+                        CompositeSurfaceElement::SurfaceId idOfNew =
+                            _comp_surface.join(idA, idB, dirA, dirB);
+                        auto access = _comp_surface.getProvider(idOfNew);
+                        access.setShader(_two_sided_light);
+                    } else if (_merge) {
+                        _comp_surface.merge(idA, idB, dirA, dirB);
+                    }
+
+                } catch (Exception ex) {
+                    std::cerr << "Failed to join/merge surfaces: " << ex
+                              << '\n';
+                }
+                _comp_surface.updateVBOs(100, 100);
+                _join = _merge = false;
+            }
         }
     }
 }
@@ -523,18 +556,24 @@ void GLWidget::change_selected_arcs_color()
     updateGL();
 }
 
-void GLWidget::join_arcs()
+void GLWidget::join()
 {
-    _merge   = GL_FALSE;
-    _join    = GL_TRUE;
+    _merge = GL_FALSE;
+    _join  = GL_TRUE;
+
     _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1;
+    _last_access.reset();
+    _select_access.reset();
 }
 
-void GLWidget::merge_arcs()
+void GLWidget::merge()
 {
-    _join    = GL_FALSE;
-    _merge   = GL_TRUE;
+    _join  = GL_FALSE;
+    _merge = GL_TRUE;
+
     _arc1[0] = _arc1[1] = _arc2[0] = _arc2[1] = -1;
+    _last_access.reset();
+    _select_access.reset();
 }
 
 
@@ -560,23 +599,25 @@ void GLWidget::insert_isolated_surface()
     for (GLuint row = 0; row < 4; ++row) {
         for (GLuint col = 0; col < 4; ++col) {
             patch->SetData(row, col,
-                           DCoordinate3(row * 1.0, col * 1.0, sin(row + col)));
+                           DCoordinate3(row * 1.0 + _cursor_x,
+                                        col * 1.0 + _cursor_y,
+                                        sin(row + col) + _cursor_z));
         }
     }
 
-    SecondOrderHyperbolicCompositeSurface::SurfaceId id =
-        _comp_surface.add(patch);
-    auto access = _comp_surface.getProvider(id);
+    // Just testing:
+    _cursor_x += 5.0;
+    _cursor_y -= 3.0;
+    _cursor_z -= 1.5;
+
+    CompositeSurfaceElement::SurfaceId id     = _comp_surface.add(patch);
+    auto                               access = _comp_surface.getProvider(id);
     access.setMaterial(MatFBTurquoise);
     access.setShader(_two_sided_light);
 
     // TODO: Don't hardcode div point count!
-    if (_comp_surface.updateVBOs(100, 100)) {
-        _is_patch_vbo_updated = true;
-        updateGL();
-    } else {
-        _is_patch_vbo_updated = false;
-    }
+    _is_patch_vbo_updated = _comp_surface.updateVBOs(100, 100);
+    updateGL();
 }
 
 } // namespace cagd

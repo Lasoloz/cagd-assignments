@@ -9,10 +9,12 @@ class CompositeSurfaceProvider
 {
 
 public:
-    CompositeSurfaceProvider(CompositeSurfaceElement &element,
-                             GLuint                   selectedPoint = 0)
+    CompositeSurfaceProvider(CompositeSurfaceElement &          element,
+                             CompositeSurfaceElement::SurfaceId id,
+                             GLuint selectedPoint = 0)
         : _element(element)
         , _selected_point(selectedPoint)
+        , _id(id)
     {}
 
     const ShaderProgram &getShader() const;
@@ -33,9 +35,16 @@ public:
     void getPoint(GLuint row, GLuint column, DCoordinate3 &point);
     void setPoint(GLuint row, GLuint column, const DCoordinate3 &point);
 
+    void joinWithProvider(CompositeSurfaceProvider &other);
+
+    CompositeSurfaceElement::SurfaceId getId() const;
+
+    CompositeSurfaceElement::Direction getDirection() const;
+
 private:
-    CompositeSurfaceElement &_element;
-    GLuint                   _selected_point;
+    CompositeSurfaceElement &          _element;
+    GLuint                             _selected_point;
+    CompositeSurfaceElement::SurfaceId _id;
 };
 
 

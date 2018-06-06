@@ -75,4 +75,39 @@ void CompositeSurfaceProvider::setPoint(GLuint row, GLuint column,
     _element._own_surface_ptr->SetData(row, column, point);
 }
 
+
+CompositeSurfaceElement::SurfaceId CompositeSurfaceProvider::getId() const
+{
+    return _id;
+}
+
+
+CompositeSurfaceElement::Direction CompositeSurfaceProvider::getDirection() const
+{
+    switch (_selected_point) {
+    case 3:
+        return CompositeSurfaceElement::NORTH_WEST;
+    case 7:
+    case 11:
+        return CompositeSurfaceElement::NORTH;
+    case 15:
+        return CompositeSurfaceElement::NORTH_EAST;
+    case 13:
+    case 14:
+        return CompositeSurfaceElement::EAST;
+    case 12:
+        return CompositeSurfaceElement::SOUTH_EAST;
+    case 4:
+    case 8:
+        return CompositeSurfaceElement::SOUTH;
+    case 0:
+        return CompositeSurfaceElement::SOUTH_WEST;
+    case 1:
+    case 2:
+        return CompositeSurfaceElement::WEST;
+    default:
+        throw Exception("User must select outer point!");
+    }
+}
+
 } // namespace cagd

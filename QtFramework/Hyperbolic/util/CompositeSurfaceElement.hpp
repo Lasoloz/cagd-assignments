@@ -14,6 +14,8 @@ namespace cagd {
 class CompositeSurfaceElement
 {
 public:
+    typedef unsigned SurfaceId;
+
     friend class CompositeSurfaceProvider;
 
     enum Direction
