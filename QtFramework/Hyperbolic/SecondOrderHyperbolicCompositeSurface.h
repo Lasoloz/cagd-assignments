@@ -60,6 +60,7 @@ public:
                              bool                               named,
                              GLuint                             offset = 0
                              ) const;
+    void renderUVParametricLines() const;
 
     CompositeSurfaceProvider getProvider(CompositeSurfaceElement::SurfaceId id);
     CompositeSurfaceProvider getSelected(GLuint selectedIndex,

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "CompositeSurfaceElement.hpp"
 
 
@@ -40,6 +42,7 @@ public:
     CompositeSurfaceElement::SurfaceId getId() const;
 
     CompositeSurfaceElement::Direction getDirection() const;
+    //    std::vector<CompositeSurfaceElement::Direction> getDirections() const;
 
 private:
     CompositeSurfaceElement &          _element;

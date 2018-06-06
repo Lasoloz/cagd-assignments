@@ -46,8 +46,10 @@ private:
     std::array<Direction, DIR_COUNT>                 _neighbor_back_references;
     std::unique_ptr<SecondOrderHyperbolicPatch>      _own_surface_ptr;
 
-    std::unique_ptr<TriangulatedMesh3> _surf_image;
-    bool _update_needed;
+    std::unique_ptr<TriangulatedMesh3>          _surf_image;
+    std::vector<std::unique_ptr<GenericCurve3>> _u_parametric_lines;
+    std::vector<std::unique_ptr<GenericCurve3>> _v_parametric_lines;
+    bool                                        _update_needed;
 
     std::shared_ptr<ShaderProgram> _shader;
     Material                       _material;
@@ -80,6 +82,9 @@ public:
     // Merge methods:
     void mergeWith(Direction, Direction, CompositeSurfaceElement *);
 
+    // Both:
+    void forceConditions();
+
     // Test methods:
     bool isNeighbor(const CompositeSurfaceElement &other,
                     Direction                      directionThis) const;
@@ -92,6 +97,7 @@ public:
     void renderControlPoints(std::shared_ptr<TriangulatedMesh3> &) const;
     void renderControlPoints(std::shared_ptr<TriangulatedMesh3> &,
                              GLuint) const;
+    void renderUVParametricLines() const;
 
     // Utility methods:
     SecondOrderHyperbolicPatch *releaseOwnSurface();

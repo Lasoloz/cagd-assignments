@@ -182,6 +182,7 @@ void CompositeSurfaceElement::forceBorderCondition(Direction direction,
 
 
     if (thisOnePoint != otherOnePoint) {
+        std::cerr << thisOnePoint << ", " << otherOnePoint << '\n';
         throw Exception("Cannot join edge with corner");
     }
 
@@ -315,7 +316,27 @@ void CompositeSurfaceElement::mergeWith(Direction                direction,
             //            secondPatch->SetData(x1o, y1o, middle);
         });
 
-    neighbor->_update_needed = true;
+    neighbor->forceConditions();
+}
+
+
+// Both:
+// =====
+void CompositeSurfaceElement::forceConditions()
+{
+    if (!_update_needed) {
+        for (int i = 0; i < DIR_COUNT; ++i) {
+            Direction                dir      = Direction(i);
+            CompositeSurfaceElement *neighbor = _neighbors[dir];
+
+            if (neighbor) {
+                Direction backDir = _neighbor_back_references[dir];
+                joinWith(dir, backDir, neighbor);
+                neighbor->forceConditions();
+            }
+        }
+        _update_needed = true;
+    }
 }
 
 
@@ -347,6 +368,25 @@ bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
         if (!_own_surface_ptr->UpdateVertexBufferObjectsOfData()) {
             return false;
         }
+
+        RowMatrix<GenericCurve3 *> *uLines =
+            _own_surface_ptr->GenerateUIsoparametricLines(10, 1, 100);
+        RowMatrix<GenericCurve3 *> *vLines =
+            _own_surface_ptr->GenerateVIsoparametricLines(10, 1, 100);
+
+        _u_parametric_lines.clear();
+        _v_parametric_lines.clear();
+        for (int i = 0; i < 10; ++i) {
+            (*uLines)[i]->UpdateVertexBufferObjects();
+            _u_parametric_lines.push_back(
+                std::unique_ptr<GenericCurve3>((*uLines)[i]));
+            (*vLines)[i]->UpdateVertexBufferObjects();
+            _v_parametric_lines.push_back(
+                std::unique_ptr<GenericCurve3>((*vLines)[i]));
+        }
+
+        delete uLines;
+        delete vLines;
 
         _update_needed = false;
     }
@@ -390,6 +430,16 @@ void CompositeSurfaceElement::renderControlPoints(
 
             glPopMatrix();
         }
+    }
+}
+
+void CompositeSurfaceElement::renderUVParametricLines() const
+{
+    glColor3f(_wireframe_red_component, _wireframe_green_component,
+              _wireframe_blue_component);
+    for (int i = 0; i < 10; ++i) {
+        _u_parametric_lines[i]->RenderDerivatives(0, GL_LINE_STRIP);
+        _v_parametric_lines[i]->RenderDerivatives(0, GL_LINE_STRIP);
     }
 }
 

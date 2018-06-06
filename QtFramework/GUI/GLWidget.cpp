@@ -25,6 +25,7 @@ GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     , _is_wireframe_shown(false)
     , _is_control_points_shown(false)
     , _is_surface_shown(true)
+    , _selection_type(SelectionType::NO_SELECTION)
 {
     _comp_curve = 0;
 
@@ -163,6 +164,7 @@ void GLWidget::paintGL()
 
         if (_is_surface_shown) {
             _comp_surface.renderSurface();
+            _comp_surface.renderUVParametricLines();
         }
 
         if (_is_control_points_shown) {

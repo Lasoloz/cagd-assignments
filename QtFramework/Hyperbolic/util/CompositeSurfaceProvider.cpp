@@ -60,7 +60,9 @@ void CompositeSurfaceProvider::setSelectedPoint(const DCoordinate3 &point)
 {
     _element._own_surface_ptr->SetData(_selected_point / 4, _selected_point % 4,
                                        point);
-    _element._update_needed = true;
+
+    // Ugly rejoin:
+    _element.forceConditions();
 }
 
 void CompositeSurfaceProvider::getPoint(GLuint row, GLuint column,
@@ -82,7 +84,8 @@ CompositeSurfaceElement::SurfaceId CompositeSurfaceProvider::getId() const
 }
 
 
-CompositeSurfaceElement::Direction CompositeSurfaceProvider::getDirection() const
+CompositeSurfaceElement::Direction
+CompositeSurfaceProvider::getDirection() const
 {
     switch (_selected_point) {
     case 3:
@@ -109,5 +112,51 @@ CompositeSurfaceElement::Direction CompositeSurfaceProvider::getDirection() cons
         throw Exception("User must select outer point!");
     }
 }
+
+
+// std::vector<CompositeSurfaceElement::Direction>
+// CompositeSurfaceProvider::getDirections() const
+//{
+//    //    std::vector<CompositeSurfaceElement::Direction> directions;
+//    switch (_selected_point) {
+//    case 0:
+//    case 5:
+//        return {CompositeSurfaceElement::SOUTH_WEST,
+//                CompositeSurfaceElement::WEST,
+//                CompositeSurfaceElement::SOUTH};
+//    case 1:
+//    case 4:
+//        return {CompositeSurfaceElement::WEST,
+//        CompositeSurfaceElement::SOUTH};
+//    case 2:
+//    case 7:
+//        return {CompositeSurfaceElement::WEST,
+//        CompositeSurfaceElement::NORTH};
+//    case 3:
+//    case 6:
+//        return {CompositeSurfaceElement::WEST,
+//                CompositeSurfaceElement::NORTH_WEST,
+//                CompositeSurfaceElement::NORTH};
+//    case 8:
+//    case 13:
+//        return {CompositeSurfaceElement::SOUTH,
+//        CompositeSurfaceElement::EAST};
+//    case 9:
+//    case 12:
+//        return {CompositeSurfaceElement::SOUTH, CompositeSurfaceElement::EAST,
+//                CompositeSurfaceElement::SOUTH_EAST};
+//    case 10:
+//    case 15:
+//        return {CompositeSurfaceElement::NORTH,
+//                CompositeSurfaceElement::NORTH_EAST,
+//                CompositeSurfaceElement::EAST};
+//    case 11:
+//    case 14:
+//        return {CompositeSurfaceElement::NORTH,
+//        CompositeSurfaceElement::EAST};
+//    default:
+//        return {};
+//    }
+//}
 
 } // namespace cagd
