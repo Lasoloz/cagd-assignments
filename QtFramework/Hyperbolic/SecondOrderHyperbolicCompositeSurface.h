@@ -61,6 +61,11 @@ public:
                                          GLuint pointCount);
 
     size_t getPatchCount() const;
+
+    friend std::ostream &operator<<(std::ostream &lhs,
+                                    const CompositeSurfaceElement &rhs);
+    friend std::istream &operator>>(std::istream &lhs,
+                                    CompositeSurfaceElement &rhs);
 };
 
 } // namespace cagd

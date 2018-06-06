@@ -450,5 +450,4 @@ void swap(CompositeSurfaceElement &first, CompositeSurfaceElement &second)
     swap(first._wireframe_green_component, second._wireframe_green_component);
     swap(first._wireframe_blue_component, second._wireframe_blue_component);
 }
-
 } // namespace cagd

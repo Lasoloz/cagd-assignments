@@ -36,7 +36,7 @@ public:
 
 
 private:
-    static double default_tension;
+    static double   default_tension;
 
     unsigned _use_count;
 
@@ -93,7 +93,6 @@ public:
 
     // Utility methods:
     SecondOrderHyperbolicPatch *releaseOwnSurface();
-
     GLdouble getAlphaTension() const;
 
 

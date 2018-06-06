@@ -201,7 +201,7 @@ std::ostream &operator<<(std::ostream &lhs,
 
     for (const auto& element: rhs._patches) {
         for (GLuint i = 0; i < CompositeSurfaceElement::DIR_COUNT; ++i) {
-
+            lhs << element.
         }
     }
 
