@@ -163,6 +163,7 @@ void GLWidget::paintGL()
 
         if (_is_surface_shown) {
             _comp_surface.renderSurface();
+            _comp_surface.renderUVParametricLines();
         }
 
         if (_is_control_points_shown) {

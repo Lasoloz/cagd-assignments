@@ -58,6 +58,7 @@ public:
     void renderWireframe(GLenum flag = GL_LINE_STRIP);
     void renderControlPoints(std::shared_ptr<TriangulatedMesh3> pointMesh,
                              bool                               named) const;
+    void renderUVParametricLines() const;
 
     CompositeSurfaceProvider getProvider(CompositeSurfaceElement::SurfaceId id);
     CompositeSurfaceProvider getSelected(GLuint selectedIndex,

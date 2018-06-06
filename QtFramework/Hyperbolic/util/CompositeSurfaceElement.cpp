@@ -369,6 +369,25 @@ bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
             return false;
         }
 
+        RowMatrix<GenericCurve3 *> *uLines =
+            _own_surface_ptr->GenerateUIsoparametricLines(10, 1, 100);
+        RowMatrix<GenericCurve3 *> *vLines =
+            _own_surface_ptr->GenerateVIsoparametricLines(10, 1, 100);
+
+        _u_parametric_lines.clear();
+        _v_parametric_lines.clear();
+        for (int i = 0; i < 10; ++i) {
+            (*uLines)[i]->UpdateVertexBufferObjects();
+            _u_parametric_lines.push_back(
+                std::unique_ptr<GenericCurve3>((*uLines)[i]));
+            (*vLines)[i]->UpdateVertexBufferObjects();
+            _v_parametric_lines.push_back(
+                std::unique_ptr<GenericCurve3>((*vLines)[i]));
+        }
+
+        delete uLines;
+        delete vLines;
+
         _update_needed = false;
     }
 
@@ -411,6 +430,16 @@ void CompositeSurfaceElement::renderControlPoints(
 
             glPopMatrix();
         }
+    }
+}
+
+void CompositeSurfaceElement::renderUVParametricLines() const
+{
+    glColor3f(_wireframe_red_component, _wireframe_green_component,
+              _wireframe_blue_component);
+    for (int i = 0; i < 10; ++i) {
+        _u_parametric_lines[i]->RenderDerivatives(0, GL_LINE_STRIP);
+        _v_parametric_lines[i]->RenderDerivatives(0, GL_LINE_STRIP);
     }
 }
 

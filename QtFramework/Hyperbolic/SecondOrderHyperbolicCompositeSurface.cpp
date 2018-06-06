@@ -166,6 +166,13 @@ void SecondOrderHyperbolicCompositeSurface::renderControlPoints(
     }
 }
 
+void SecondOrderHyperbolicCompositeSurface::renderUVParametricLines() const
+{
+    for (auto &patch : _patches) {
+        patch.second.renderUVParametricLines();
+    }
+}
+
 
 CompositeSurfaceProvider SecondOrderHyperbolicCompositeSurface::getProvider(
     CompositeSurfaceElement::SurfaceId id)
