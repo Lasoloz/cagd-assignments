@@ -81,9 +81,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(_side_widget->selectedColorButton, SIGNAL(pressed()), _gl_widget,
             SLOT(change_selected_color()));
     connect(_side_widget->joinArcsButton, SIGNAL(pressed()), _gl_widget,
-            SLOT(join_arcs()));
+            SLOT(join()));
     connect(_side_widget->mergeArcsButton, SIGNAL(pressed()), _gl_widget,
-            SLOT(merge_arcs()));
+            SLOT(merge()));
 
 
     // Patches:
@@ -95,6 +95,11 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(set_patch_image_shown(bool)));
     connect(_side_widget->insertNewPatchButton, SIGNAL(pressed()), _gl_widget,
             SLOT(insert_isolated_surface()));
+
+    connect(_side_widget->joinPatchButton, SIGNAL(pressed()), _gl_widget,
+            SLOT(join()));
+    connect(_side_widget->mergePatchButton, SIGNAL(pressed()), _gl_widget,
+            SLOT(merge()));
 }
 
 //--------------------------------

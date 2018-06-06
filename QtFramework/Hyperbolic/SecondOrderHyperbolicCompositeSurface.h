@@ -15,34 +15,39 @@ namespace cagd {
 
 class SecondOrderHyperbolicCompositeSurface
 {
-public:
-    typedef unsigned SurfaceId;
-
 private:
-    SurfaceId                                    _current_id;
-    std::map<SurfaceId, CompositeSurfaceElement> _patches;
+    CompositeSurfaceElement::SurfaceId _current_id;
+    std::map<CompositeSurfaceElement::SurfaceId, CompositeSurfaceElement>
+        _patches;
 
 public:
     SecondOrderHyperbolicCompositeSurface();
 
-    SurfaceId add(SecondOrderHyperbolicPatch *patch_taken);
+    CompositeSurfaceElement::SurfaceId
+    add(SecondOrderHyperbolicPatch *patch_taken);
 
-    SurfaceId join(SurfaceId surfaceIdA, SurfaceId surfaceIdB,
-                   CompositeSurfaceElement::Direction directionA,
-                   CompositeSurfaceElement::Direction directionB);
+    CompositeSurfaceElement::SurfaceId
+    join(CompositeSurfaceElement::SurfaceId surfaceIdA,
+         CompositeSurfaceElement::SurfaceId surfaceIdB,
+         CompositeSurfaceElement::Direction directionA,
+         CompositeSurfaceElement::Direction directionB);
 
-    SurfaceId joinToFirst(SurfaceId                          olderSurfaceId,
-                          SecondOrderHyperbolicPatch *       patch_taken,
-                          CompositeSurfaceElement::Direction olderDirection,
-                          CompositeSurfaceElement::Direction newerDirection);
-    void      joinToFirst(SurfaceId surfaceIdA, SurfaceId surfaceIdB,
-                          CompositeSurfaceElement::Direction directionA,
-                          CompositeSurfaceElement::Direction directionB);
+    CompositeSurfaceElement::SurfaceId
+         joinToFirst(CompositeSurfaceElement::SurfaceId olderSurfaceId,
+                     SecondOrderHyperbolicPatch *       patch_taken,
+                     CompositeSurfaceElement::Direction olderDirection,
+                     CompositeSurfaceElement::Direction newerDirection);
+    void joinToFirst(CompositeSurfaceElement::SurfaceId surfaceIdA,
+                     CompositeSurfaceElement::SurfaceId surfaceIdB,
+                     CompositeSurfaceElement::Direction directionA,
+                     CompositeSurfaceElement::Direction directionB);
 
-    bool areJoined(SurfaceId surfaceIdA, SurfaceId surfaceIdB,
+    bool areJoined(CompositeSurfaceElement::SurfaceId surfaceIdA,
+                   CompositeSurfaceElement::SurfaceId surfaceIdB,
                    CompositeSurfaceElement::Direction directionA) const;
 
-    void merge(SurfaceId surfaceIdA, SurfaceId surfaceIdB,
+    void merge(CompositeSurfaceElement::SurfaceId surfaceIdA,
+               CompositeSurfaceElement::SurfaceId surfaceIdB,
                CompositeSurfaceElement::Direction directionA,
                CompositeSurfaceElement::Direction directionB);
 
@@ -54,7 +59,7 @@ public:
     void renderControlPoints(std::shared_ptr<TriangulatedMesh3> pointMesh,
                              bool                               named) const;
 
-    CompositeSurfaceProvider getProvider(SurfaceId id);
+    CompositeSurfaceProvider getProvider(CompositeSurfaceElement::SurfaceId id);
     CompositeSurfaceProvider getSelected(GLuint selectedIndex,
                                          GLuint pointCount);
 

@@ -63,6 +63,11 @@ private:
     SecondOrderHyperbolicCompositeCurve * _comp_curve;
     SecondOrderHyperbolicCompositeSurface _comp_surface;
 
+    // 3D cursor:
+    GLdouble _cursor_x;
+    GLdouble _cursor_y;
+    GLdouble _cursor_z;
+
 
     // Composite variables:
     bool _is_patch_vbo_updated;
@@ -78,6 +83,7 @@ private:
     GLdouble      _reposition_unit;
 
     std::shared_ptr<CompositeSurfaceProvider> _select_access;
+    std::shared_ptr<CompositeSurfaceProvider> _last_access;
 
 
     GLvoid    joinAndMergeHelper();
@@ -130,8 +136,8 @@ public slots:
     void continue_arc();
     void change_selected_color();
     void change_selected_arcs_color();
-    void join_arcs();
-    void merge_arcs();
+    void join();
+    void merge();
 
     // Patch:
     void set_patch_wireframe_shown(bool value);

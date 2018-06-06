@@ -8,6 +8,7 @@ double CompositeSurfaceElement::default_tension = 1.0;
 CompositeSurfaceElement::CompositeSurfaceElement()
     : _use_count(0)
     , _update_needed(true)
+    , _material(MatFBRuby)
     , _wireframe_red_component(1.f)
     , _wireframe_green_component(1.f)
     , _wireframe_blue_component(1.f)
@@ -25,6 +26,7 @@ CompositeSurfaceElement::CompositeSurfaceElement(
     : _use_count(0)
     , _own_surface_ptr(patch_taken)
     , _update_needed(true)
+    , _material(MatFBRuby)
     , _wireframe_red_component(1.f)
     , _wireframe_green_component(1.f)
     , _wireframe_blue_component(1.f)
@@ -312,6 +314,8 @@ void CompositeSurfaceElement::mergeWith(Direction                direction,
             //            firstPatch->SetData(x1t, y1t, middle);
             //            secondPatch->SetData(x1o, y1o, middle);
         });
+
+    neighbor->_update_needed = true;
 }
 
 
@@ -329,7 +333,7 @@ bool CompositeSurfaceElement::isNeighbor(const CompositeSurfaceElement &other,
 // ===============
 bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
 {
-    if (_update_needed) {
+    if (_update_needed || !_surf_image) {
         _surf_image.reset(_own_surface_ptr->GenerateImage(divU, divV));
         if (!_surf_image) {
             return false;
