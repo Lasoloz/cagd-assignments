@@ -6,6 +6,7 @@
 #include <GL/glu.h>
 
 #include <iostream>
+#include <fstream>
 #include <string>
 
 using namespace std;
@@ -24,7 +25,9 @@ GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     , _is_wireframe_shown(false)
     , _is_control_points_shown(false)
     , _is_surface_shown(true)
+    , _selection_type(SelectionType::NO_SELECTION)
     , _update_parametric_lines(false)
+    ,  _is_normals_shown(false)
 {
     _comp_curve = 0;
 
@@ -127,7 +130,6 @@ void GLWidget::initializeGL()
         _control_point_mesh = std::make_shared<TriangulatedMesh3>();
         _control_point_mesh->LoadFromOFF("Models/sphere.off", GL_TRUE);
         _control_point_mesh->UpdateVertexBufferObjects();
-
     } catch (Exception &e) {
         cout << e << endl;
     }
@@ -169,7 +171,10 @@ void GLWidget::paintGL()
         if (_update_parametric_lines) {
             _comp_surface.renderUVParametricLines();
         }
-        //_comp_surface.renderNormals();
+
+        if (_is_normals_shown) {
+            _comp_surface.renderNormals();
+        }
 
         if (_is_control_points_shown) {
             _comp_surface.renderControlPoints(_control_point_mesh, false);
@@ -214,8 +219,9 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         GLint viewport[4];
         glGetIntegerv(GL_VIEWPORT, viewport);
 
-        GLuint  size        = 4 * (4 * _comp_curve->getCurveCount() +
-                           16 * (GLuint)_comp_surface.getPatchCount());
+        GLuint curveControlPointCount   = 4 * _comp_curve->getCurveCount();
+        GLuint  size                    = 4 * (curveControlPointCount +
+                                          16 * (GLuint)_comp_surface.getPatchCount());
         GLuint *pick_buffer = new GLuint[size];
         glSelectBuffer(size, pick_buffer);
 
@@ -254,9 +260,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
         // render only the clickable geometries
         _comp_curve->renderClickable(true);
-        _comp_surface.renderSurface();
-        _comp_surface.renderWireframe();
-        _comp_surface.renderControlPoints(_control_point_mesh, true);
+        _comp_surface.renderControlPoints(_control_point_mesh, true, curveControlPointCount);
 
         glPopMatrix();
 
@@ -280,16 +284,15 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
                 }
             }
 
-            GLuint curveCount = _comp_curve->getCurveCount() * 4;
-            if (closest_selected < curveCount) {
+            if (closest_selected < curveControlPointCount) {
                 _primitiveIndex    = closest_selected / 4;
                 _controlPointIndex = closest_selected % 4;
                 _selection_type    = SelectionType::CURVE_POINT_SELECTED;
                 _comp_curve->setSelected(_primitiveIndex, _controlPointIndex,
                                          GL_TRUE);
             } else {
-                _primitiveIndex    = (closest_selected - curveCount) / 16;
-                _controlPointIndex = (closest_selected - curveCount) % 16;
+                _primitiveIndex    = (closest_selected - curveControlPointCount) / 16;
+                _controlPointIndex = (closest_selected - curveControlPointCount) % 16;
                 try {
                     _last_access   = _select_access;
                     _select_access = std::make_shared<CompositeSurfaceProvider>(
@@ -304,8 +307,6 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
                 }
             }
 
-            cout << "patch index: " << _primitiveIndex
-                 << "control point index: " << _controlPointIndex << endl;
             joinAndMergeHelper();
         } else {
             _join = _merge = GL_FALSE;
@@ -505,6 +506,12 @@ void GLWidget::set_firstOrderDerivative(bool value)
     updateGL();
 }
 
+void GLWidget::set_secondOrderDerivative(bool value)
+{
+    _comp_curve->setRenderSecondOrderDerivatives(value);
+    updateGL();
+}
+
 void GLWidget::set_control_points(bool value)
 {
     _comp_curve->setRenderControlPoints(value);
@@ -602,6 +609,19 @@ void GLWidget::set_patch_control_points_shown(bool value)
 
 void GLWidget::set_patch_image_shown(bool value) { _is_surface_shown = value; }
 
+void GLWidget::set_normals_shown(bool value)
+{
+    _is_normals_shown = value;
+    updateGL();
+}
+
+void GLWidget::set_isoparametric_lines_shown(bool value)
+{
+    _update_parametric_lines = value;
+    _is_surface_shown = _comp_surface.updateVBOs(100, 100, _update_parametric_lines);
+    updateGL();
+}
+
 void GLWidget::insert_isolated_surface()
 {
     SecondOrderHyperbolicPatch *patch =
@@ -632,4 +652,33 @@ void GLWidget::insert_isolated_surface()
     updateGL();
 }
 
+void GLWidget::save()
+{
+    QString fileName = QFileDialog::getSaveFileName(
+                        this,
+                        tr("Save"),
+                        "./Models/",
+                        "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
+    cout << fileName.toStdString() << endl;
+
+    ofstream ofile(std::string(fileName.toStdString()));
+    if (ofile.good()) {
+        ofile << *_comp_curve;
+    }
+}
+
+void GLWidget::load()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+                            this,
+                            tr("Open"),
+                            "./Models/",
+                            "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
+    cout << fileName.toStdString() << endl;
+
+    fstream f(fileName.toStdString(), ios_base::in);
+    if (f.good()) {
+        f >> *_comp_curve;
+    }
+}
 } // namespace cagd

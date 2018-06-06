@@ -61,8 +61,14 @@ MainWindow::MainWindow(QWidget *parent)
     // Both:
     connect(_side_widget->firstOrderDerivatives, SIGNAL(clicked(bool)),
             _gl_widget, SLOT(set_firstOrderDerivative(bool)));
+    connect(_side_widget->saveButton, SIGNAL(pressed()), _gl_widget,
+            SLOT(save()));
+    connect(_side_widget->loadButton, SIGNAL(pressed()), _gl_widget,
+            SLOT(load()));
 
     // Curve:
+    connect(_side_widget->secondOrderDerivatives, SIGNAL(toggled(bool)),
+            _gl_widget, SLOT(set_secondOrderDerivative(bool)));
     connect(_side_widget->controlPolygon, SIGNAL(toggled(bool)), _gl_widget,
             SLOT(set_control_polygon(bool)));
     connect(_side_widget->controlPoints, SIGNAL(toggled(bool)), _gl_widget,
@@ -95,6 +101,10 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(set_patch_image_shown(bool)));
     connect(_side_widget->insertNewPatchButton, SIGNAL(pressed()), _gl_widget,
             SLOT(insert_isolated_surface()));
+    connect(_side_widget->showNormals, SIGNAL(toggled(bool)), _gl_widget,
+            SLOT(set_normals_shown(bool)));
+    connect(_side_widget->showIsoparametric, SIGNAL(toggled(bool)), _gl_widget,
+            SLOT(set_isoparametric_lines_shown(bool)));
 
     connect(_side_widget->joinPatchButton, SIGNAL(pressed()), _gl_widget,
             SLOT(join()));

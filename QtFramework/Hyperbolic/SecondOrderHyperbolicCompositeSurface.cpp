@@ -160,10 +160,9 @@ void SecondOrderHyperbolicCompositeSurface::renderWireframe(GLenum flag)
 }
 
 void SecondOrderHyperbolicCompositeSurface::renderControlPoints(
-    std::shared_ptr<TriangulatedMesh3> pointMesh, bool named) const
+    std::shared_ptr<TriangulatedMesh3> pointMesh, bool named, GLuint startCount) const
 {
     if (named) {
-        GLuint startCount = 0;
         for (auto &patch : _patches) {
             patch.second.renderControlPoints(pointMesh, startCount);
 
