@@ -61,8 +61,14 @@ MainWindow::MainWindow(QWidget *parent)
     // Both:
     connect(_side_widget->firstOrderDerivatives, SIGNAL(clicked(bool)),
             _gl_widget, SLOT(set_firstOrderDerivative(bool)));
+    connect(_side_widget->saveButton, SIGNAL(pressed()), _gl_widget,
+            SLOT(save()));
+    connect(_side_widget->loadButton, SIGNAL(pressed()), _gl_widget,
+            SLOT(load()));
 
     // Curve:
+    connect(_side_widget->secondOrderDerivatives, SIGNAL(toggled(bool)),
+            _gl_widget, SLOT(set_secondOrderDerivative(bool)));
     connect(_side_widget->controlPolygon, SIGNAL(toggled(bool)), _gl_widget,
             SLOT(set_control_polygon(bool)));
     connect(_side_widget->controlPoints, SIGNAL(toggled(bool)), _gl_widget,

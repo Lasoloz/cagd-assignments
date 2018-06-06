@@ -241,7 +241,7 @@
       <x>0</x>
       <y>0</y>
       <width>281</width>
-      <height>188</height>
+      <height>200</height>
      </rect>
     </property>
     <attribute name="label">
@@ -263,7 +263,7 @@
       <property name="geometry">
        <rect>
         <x>140</x>
-        <y>50</y>
+        <y>70</y>
         <width>131</width>
         <height>17</height>
        </rect>
@@ -341,7 +341,7 @@
       <property name="geometry">
        <rect>
         <x>140</x>
-        <y>70</y>
+        <y>90</y>
         <width>131</width>
         <height>17</height>
        </rect>
@@ -354,7 +354,7 @@
       <property name="geometry">
        <rect>
         <x>140</x>
-        <y>90</y>
+        <y>110</y>
         <width>131</width>
         <height>17</height>
        </rect>
@@ -382,6 +382,19 @@
        <bool>false</bool>
       </property>
      </widget>
+     <widget class="QCheckBox" name="secondOrderDerivatives">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>50</y>
+        <width>141</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Second order derivatives</string>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="surfacesPage">
@@ -390,7 +403,7 @@
       <x>0</x>
       <y>0</y>
       <width>281</width>
-      <height>188</height>
+      <height>200</height>
      </rect>
     </property>
     <attribute name="label">
@@ -539,7 +552,7 @@
       <x>0</x>
       <y>0</y>
       <width>281</width>
-      <height>188</height>
+      <height>200</height>
      </rect>
     </property>
     <attribute name="label">
@@ -757,9 +770,37 @@
     </property>
    </widget>
   </widget>
+  <widget class="QPushButton" name="saveButton">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>620</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadButton">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>620</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load</string>
+   </property>
+  </widget>
   <zorder>groupBox</zorder>
   <zorder>customizeColor</zorder>
   <zorder>customizePage</zorder>
+  <zorder>saveButton</zorder>
+  <zorder>loadButton</zorder>
  </widget>
  <resources/>
  <connections/>

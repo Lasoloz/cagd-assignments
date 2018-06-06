@@ -6,6 +6,7 @@
 #include <GL/glu.h>
 
 #include <iostream>
+#include <fstream>
 #include <string>
 
 using namespace std;
@@ -126,7 +127,6 @@ void GLWidget::initializeGL()
         _control_point_mesh = std::make_shared<TriangulatedMesh3>();
         _control_point_mesh->LoadFromOFF("Models/sphere.off", GL_TRUE);
         _control_point_mesh->UpdateVertexBufferObjects();
-
     } catch (Exception &e) {
         cout << e << endl;
     }
@@ -494,6 +494,12 @@ void GLWidget::set_firstOrderDerivative(bool value)
     updateGL();
 }
 
+void GLWidget::set_secondOrderDerivative(bool value)
+{
+    _comp_curve->setRenderSecondOrderDerivatives(value);
+    updateGL();
+}
+
 void GLWidget::set_control_points(bool value)
 {
     _comp_curve->setRenderControlPoints(value);
@@ -620,4 +626,33 @@ void GLWidget::insert_isolated_surface()
     updateGL();
 }
 
+void GLWidget::save()
+{
+    QString fileName = QFileDialog::getSaveFileName(
+                        this,
+                        tr("Save"),
+                        "./Models/",
+                        "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
+    cout << fileName.toStdString() << endl;
+
+    ofstream ofile(std::string(fileName.toStdString()));
+    if (ofile.good()) {
+        ofile << *_comp_curve;
+    }
+}
+
+void GLWidget::load()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+                            this,
+                            tr("Open"),
+                            "./Models/",
+                            "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
+    cout << fileName.toStdString() << endl;
+
+    fstream f(fileName.toStdString(), ios_base::in);
+    if (f.good()) {
+        f >> *_comp_curve;
+    }
+}
 } // namespace cagd

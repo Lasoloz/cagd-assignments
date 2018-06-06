@@ -1,23 +1,23 @@
 #pragma once
 
-#include <Core/GenericCurves3.h>
+#include <GL/glew.h>
 #include <Core/Lights.h>
 #include <Core/Materials.h>
+#include <Core/GenericCurves3.h>
 #include <Core/ShaderPrograms.h>
 #include <Core/TriangulatedMeshes3.h>
-#include <GL/glew.h>
 #include <Hyperbolic/SecondOrderHyperbolicArc.h>
 #include <Hyperbolic/SecondOrderHyperbolicCompositeCurve.h>
 #include <Hyperbolic/SecondOrderHyperbolicCompositeSurface.h>
 #include <Hyperbolic/SecondOrderHyperbolicPatch.h>
 #include <Parametric/ParametricCurves3.h>
 #include <Parametric/ParametricSurfaces3.h>
-#include <QGLFormat>
-#include <QGLWidget>
 #include <Test/TestFunctions.h>
 #include <util/util.hpp>
 
 #include <QTimer>
+#include <QGLFormat>
+#include <QGLWidget>
 #include <QWheelEvent>
 
 #include <memory>
@@ -127,6 +127,7 @@ public slots:
     void set_firstOrderDerivative(bool value);
 
     // Arc:
+    void set_secondOrderDerivative(bool value);
     void set_control_polygon(bool value);
     void set_control_points(bool value);
     void set_curve_image(bool value);
@@ -136,6 +137,7 @@ public slots:
     void continue_arc();
     void change_selected_color();
     void change_selected_arcs_color();
+
     void join();
     void merge();
 
@@ -145,6 +147,9 @@ public slots:
     void set_patch_image_shown(bool value);
 
     void insert_isolated_surface();
+
+    void save();
+    void load();
 };
 
 } // namespace cagd
