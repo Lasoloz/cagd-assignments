@@ -91,13 +91,14 @@ public:
 
 
     // Render methods:
-    bool updateVBOs(GLuint, GLuint);
+    bool updateVBOs(GLuint, GLuint, bool);
     void renderMesh(GLenum);
     void renderWireframe(GLenum) const;
     void renderControlPoints(std::shared_ptr<TriangulatedMesh3> &) const;
     void renderControlPoints(std::shared_ptr<TriangulatedMesh3> &,
                              GLuint) const;
     void renderUVParametricLines() const;
+    void renderNormals() const;
 
     // Utility methods:
     SecondOrderHyperbolicPatch *releaseOwnSurface();

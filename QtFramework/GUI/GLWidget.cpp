@@ -24,6 +24,7 @@ GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     , _is_wireframe_shown(false)
     , _is_control_points_shown(false)
     , _is_surface_shown(true)
+    , _update_parametric_lines(false)
 {
     _comp_curve = 0;
 
@@ -163,8 +164,12 @@ void GLWidget::paintGL()
 
         if (_is_surface_shown) {
             _comp_surface.renderSurface();
+        }
+
+        if (_update_parametric_lines) {
             _comp_surface.renderUVParametricLines();
         }
+        //_comp_surface.renderNormals();
 
         if (_is_control_points_shown) {
             _comp_surface.renderControlPoints(_control_point_mesh, false);
@@ -357,7 +362,8 @@ void GLWidget::wheelEvent(QWheelEvent *event)
             point[2] += dz;
             _select_access->setSelectedPoint(point);
 
-            _is_patch_vbo_updated = _comp_surface.updateVBOs(100, 100);
+            _is_patch_vbo_updated =
+                _comp_surface.updateVBOs(100, 100, _update_parametric_lines);
         }
 
         updateGL();
@@ -426,7 +432,7 @@ GLvoid GLWidget::joinAndMergeHelper()
                     std::cerr << "Failed to join/merge surfaces: " << ex
                               << '\n';
                 }
-                _comp_surface.updateVBOs(100, 100);
+                _comp_surface.updateVBOs(100, 100, _update_parametric_lines);
                 _join = _merge = false;
             }
         }
@@ -621,7 +627,8 @@ void GLWidget::insert_isolated_surface()
     access.setShader(_two_sided_light);
 
     // TODO: Don't hardcode div point count!
-    _is_patch_vbo_updated = _comp_surface.updateVBOs(100, 100);
+    _is_patch_vbo_updated =
+        _comp_surface.updateVBOs(100, 100, _update_parametric_lines);
     updateGL();
 }
 

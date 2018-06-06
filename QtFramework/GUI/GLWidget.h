@@ -74,6 +74,7 @@ private:
     bool _is_wireframe_shown;
     bool _is_control_points_shown;
     bool _is_surface_shown;
+    bool _update_parametric_lines;
 
 
     // On-screen events:

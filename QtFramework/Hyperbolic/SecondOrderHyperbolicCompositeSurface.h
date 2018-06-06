@@ -53,12 +53,13 @@ public:
 
     void setShaderForAll(std::shared_ptr<ShaderProgram> shader);
     void setMaterialForAll(Material &material);
-    bool updateVBOs(GLuint minDivU, GLuint minDivV);
+    bool updateVBOs(GLuint minDivU, GLuint minDivV, bool updateParametricLines);
     void renderSurface(GLenum flag = GL_TRIANGLES);
     void renderWireframe(GLenum flag = GL_LINE_STRIP);
     void renderControlPoints(std::shared_ptr<TriangulatedMesh3> pointMesh,
                              bool                               named) const;
     void renderUVParametricLines() const;
+    void renderNormals() const;
 
     CompositeSurfaceProvider getProvider(CompositeSurfaceElement::SurfaceId id);
     CompositeSurfaceProvider getSelected(GLuint selectedIndex,

@@ -352,7 +352,8 @@ bool CompositeSurfaceElement::isNeighbor(const CompositeSurfaceElement &other,
 
 // Render methods:
 // ===============
-bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
+bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV,
+                                         bool updateParametricLines)
 {
     if (_update_needed || !_surf_image) {
         _surf_image.reset(_own_surface_ptr->GenerateImage(divU, divV));
@@ -369,24 +370,26 @@ bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV)
             return false;
         }
 
-        RowMatrix<GenericCurve3 *> *uLines =
-            _own_surface_ptr->GenerateUIsoparametricLines(10, 1, 100);
-        RowMatrix<GenericCurve3 *> *vLines =
-            _own_surface_ptr->GenerateVIsoparametricLines(10, 1, 100);
+        if (updateParametricLines) {
+            RowMatrix<GenericCurve3 *> *uLines =
+                _own_surface_ptr->GenerateUIsoparametricLines(10, 1, 100);
+            RowMatrix<GenericCurve3 *> *vLines =
+                _own_surface_ptr->GenerateVIsoparametricLines(10, 1, 100);
 
-        _u_parametric_lines.clear();
-        _v_parametric_lines.clear();
-        for (int i = 0; i < 10; ++i) {
-            (*uLines)[i]->UpdateVertexBufferObjects();
-            _u_parametric_lines.push_back(
-                std::unique_ptr<GenericCurve3>((*uLines)[i]));
-            (*vLines)[i]->UpdateVertexBufferObjects();
-            _v_parametric_lines.push_back(
-                std::unique_ptr<GenericCurve3>((*vLines)[i]));
+            _u_parametric_lines.clear();
+            _v_parametric_lines.clear();
+            for (int i = 0; i < 10; ++i) {
+                (*uLines)[i]->UpdateVertexBufferObjects();
+                _u_parametric_lines.push_back(
+                    std::unique_ptr<GenericCurve3>((*uLines)[i]));
+                (*vLines)[i]->UpdateVertexBufferObjects();
+                _v_parametric_lines.push_back(
+                    std::unique_ptr<GenericCurve3>((*vLines)[i]));
+            }
+
+            delete uLines;
+            delete vLines;
         }
-
-        delete uLines;
-        delete vLines;
 
         _update_needed = false;
     }
@@ -431,6 +434,11 @@ void CompositeSurfaceElement::renderControlPoints(
             glPopMatrix();
         }
     }
+}
+
+void CompositeSurfaceElement::renderNormals() const
+{
+    _surf_image->RenderNormals();
 }
 
 void CompositeSurfaceElement::renderUVParametricLines() const
