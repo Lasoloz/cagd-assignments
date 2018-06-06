@@ -3,6 +3,8 @@
 #include "../Core/LinearCombination3.h"
 #include "../Core/Matrices.h"
 
+#include <cmath>
+
 namespace cagd {
 class SecondOrderHyperbolicArc;
 std::ostream &operator<<(std::ostream &                  lhs,
@@ -25,6 +27,8 @@ private:
     GLdouble zerothOrderF3(GLdouble t) const;
     GLdouble firstOrderF2(GLdouble t) const;
     GLdouble firstOrderF3(GLdouble t) const;
+    GLdouble secondOrderF2(GLdouble t) const;
+    GLdouble secondOrderF3(GLdouble t) const;
 
 public:
     SecondOrderHyperbolicArc(GLdouble alpha);

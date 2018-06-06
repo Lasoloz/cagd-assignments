@@ -106,6 +106,7 @@ public slots:
     void set_firstOrderDerivative(bool value);
 
     // Arc:
+    void set_secondOrderDerivative(bool value);
     void set_control_polygon(bool value);
     void set_control_points(bool value);
     void set_curve_image(bool value);

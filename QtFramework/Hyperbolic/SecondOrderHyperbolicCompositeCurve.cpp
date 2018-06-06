@@ -17,7 +17,7 @@ SecondOrderHyperbolicCompositeCurve::ArcAttributes::ArcAttributes(
     SecondOrderHyperbolicArc *arc)
 {
     this->arc      = new SecondOrderHyperbolicArc(*arc);
-    this->image    = this->arc->GenerateImage(1, 100); // default 100 div point
+    this->image    = this->arc->GenerateImage(2, 100); // default 100 div point
     this->color    = new Color4(0.3f, 1.0f, 0.0f, 1.0f); // default red color
     this->next     = nullptr;
     this->previous = nullptr;
@@ -96,6 +96,7 @@ SecondOrderHyperbolicCompositeCurve::SecondOrderHyperbolicCompositeCurve(
     , _renderControlPoints(GL_FALSE)
     , _renderControlPolygon(GL_FALSE)
     , _renderFirstOrderDerivatives(GL_FALSE)
+    , _renderSecondOrderDerivatives(GL_FALSE)
     , _radius(0.05)
 {
     _attributes.reserve(max_arc_count);
@@ -120,7 +121,7 @@ GLboolean SecondOrderHyperbolicCompositeCurve::insertIsolatedArc()
         initCurve(); // new SecondOrderHyperbolicArc(_alpha);
 
     _attributes.back().image =
-        _attributes.back().arc->GenerateImage(1, _div_point_count);
+        _attributes.back().arc->GenerateImage(2, _div_point_count);
 
     if (!_attributes.back().image) {
         throw Exception(
@@ -158,6 +159,11 @@ GLboolean SecondOrderHyperbolicCompositeCurve::render()
         if (i.image && _renderFirstOrderDerivatives) {
             glColor3f(.2f, .5f, .7f);
             i.image->RenderDerivatives(1, GL_LINES);
+        }
+
+        if (i.image && _renderSecondOrderDerivatives) {
+            glColor3f(.5f, .2f, .7f);
+            i.image->RenderDerivatives(2, GL_LINES);
         }
 
         renderClickable(false);
@@ -260,7 +266,7 @@ GLboolean SecondOrderHyperbolicCompositeCurve::join(GLuint    index1,
     newCurve.next = &secondCurve;
 
     newCurve.arc   = new SecondOrderHyperbolicArc(*arc);
-    newCurve.image = newCurve.arc->GenerateImage(1, _div_point_count);
+    newCurve.image = newCurve.arc->GenerateImage(2, _div_point_count);
     newCurve.color = new Color4(*(secondCurve.color));
 
     if (!newCurve.arc->UpdateVertexBufferObjectsOfData()) {
@@ -338,9 +344,9 @@ GLboolean SecondOrderHyperbolicCompositeCurve::merge(GLuint    index1,
         throw Exception("Could not update the VBOoD's hyperbolic arc!");
     }
 
-    (*firstCurve.image) = (*firstCurve.arc->GenerateImage(1, _div_point_count));
+    (*firstCurve.image) = (*firstCurve.arc->GenerateImage(2, _div_point_count));
     (*secondCurve.image) =
-        (*secondCurve.arc->GenerateImage(1, _div_point_count));
+        (*secondCurve.arc->GenerateImage(2, _div_point_count));
 
     if (!firstCurve.image->UpdateVertexBufferObjects()) {
         throw Exception(
@@ -450,7 +456,7 @@ SecondOrderHyperbolicCompositeCurve::continueExistingArc(GLuint    index,
     }
 
     newCurve.arc   = new SecondOrderHyperbolicArc(*arc);
-    newCurve.image = newCurve.arc->GenerateImage(1, _div_point_count);
+    newCurve.image = newCurve.arc->GenerateImage(2, _div_point_count);
     newCurve.color = new Color4(*(existingCurve.color));
 
     if (!newCurve.arc->UpdateVertexBufferObjectsOfData()) {
@@ -481,7 +487,7 @@ GLboolean SecondOrderHyperbolicCompositeCurve::updateCurve(
     }
 
     (*selectedCurve.image) =
-        (*selectedCurve.arc->GenerateImage(1, _div_point_count));
+        (*selectedCurve.arc->GenerateImage(2, _div_point_count));
 
     if (!selectedCurve.image->UpdateVertexBufferObjects()) {
         throw Exception(
@@ -655,7 +661,7 @@ GLboolean SecondOrderHyperbolicCompositeCurve::preserveConstraints(
         }
 
         (*arc.previous->image) =
-            (*arc.previous->arc->GenerateImage(1, _div_point_count));
+            (*arc.previous->arc->GenerateImage(2, _div_point_count));
 
         if (!arc.previous->image->UpdateVertexBufferObjects()) {
             throw Exception(
@@ -674,7 +680,7 @@ GLboolean SecondOrderHyperbolicCompositeCurve::preserveConstraints(
         }
 
         (*arc.previous->image) =
-            (*arc.previous->arc->GenerateImage(1, _div_point_count));
+            (*arc.previous->arc->GenerateImage(2, _div_point_count));
 
         if (!arc.previous->image->UpdateVertexBufferObjects()) {
             throw Exception(
@@ -693,7 +699,7 @@ GLboolean SecondOrderHyperbolicCompositeCurve::preserveConstraints(
         }
 
         (*arc.next->image) =
-            (*arc.next->arc->GenerateImage(1, _div_point_count));
+            (*arc.next->arc->GenerateImage(2, _div_point_count));
 
         if (!arc.next->image->UpdateVertexBufferObjects()) {
             throw Exception(
@@ -721,7 +727,7 @@ GLboolean SecondOrderHyperbolicCompositeCurve::preserveConstraints(
         }
 
         (*arc.next->image) =
-            (*arc.next->arc->GenerateImage(1, _div_point_count));
+            (*arc.next->arc->GenerateImage(2, _div_point_count));
 
         if (!arc.next->image->UpdateVertexBufferObjects()) {
             throw Exception(
@@ -907,6 +913,12 @@ GLvoid SecondOrderHyperbolicCompositeCurve::setRenderFirstOrderDerivatives(
     GLboolean value)
 {
     _renderFirstOrderDerivatives = value;
+}
+
+GLvoid SecondOrderHyperbolicCompositeCurve::setRenderSecondOrderDerivatives(
+        GLboolean value)
+{
+    _renderSecondOrderDerivatives = value;
 }
 
 std::ostream &operator<<(std::ostream &lhs,

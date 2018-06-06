@@ -67,6 +67,8 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(load()));
 
     // Curve:
+    connect(_side_widget->secondOrderDerivatives, SIGNAL(toggled(bool)),
+            _gl_widget, SLOT(set_secondOrderDerivative(bool)));
     connect(_side_widget->controlPolygon, SIGNAL(toggled(bool)), _gl_widget,
             SLOT(set_control_polygon(bool)));
     connect(_side_widget->controlPoints, SIGNAL(toggled(bool)), _gl_widget,

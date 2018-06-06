@@ -233,7 +233,7 @@
     <bool>false</bool>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="curvesPage">
     <property name="geometry">
@@ -263,7 +263,7 @@
       <property name="geometry">
        <rect>
         <x>140</x>
-        <y>50</y>
+        <y>70</y>
         <width>131</width>
         <height>17</height>
        </rect>
@@ -341,7 +341,7 @@
       <property name="geometry">
        <rect>
         <x>140</x>
-        <y>70</y>
+        <y>90</y>
         <width>131</width>
         <height>17</height>
        </rect>
@@ -354,7 +354,7 @@
       <property name="geometry">
        <rect>
         <x>140</x>
-        <y>90</y>
+        <y>110</y>
         <width>131</width>
         <height>17</height>
        </rect>
@@ -380,6 +380,19 @@
       </property>
       <property name="checkable">
        <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="secondOrderDerivatives">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>50</y>
+        <width>141</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Second order derivatives</string>
       </property>
      </widget>
     </widget>

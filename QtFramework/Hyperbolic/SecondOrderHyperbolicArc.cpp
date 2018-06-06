@@ -33,7 +33,7 @@ GLboolean
 SecondOrderHyperbolicArc::CalculateDerivatives(GLuint max_order_of_derivatives,
                                                GLdouble u, Derivatives &d) const
 {
-    if (u < 0.0 || u > _alpha || max_order_of_derivatives > 1) {
+    if (u < 0.0 || u > _alpha || max_order_of_derivatives > 2) {
         return GL_FALSE;
     }
 
@@ -52,8 +52,12 @@ SecondOrderHyperbolicArc::CalculateDerivatives(GLuint max_order_of_derivatives,
     derivatives(1, 1) = -firstOrderF2(_alpha - u);
     derivatives(1, 2) = firstOrderF2(u);
     derivatives(1, 3) = firstOrderF3(u);
+    derivatives(2, 0) = secondOrderF3(_alpha - u);
+    derivatives(2, 1) = secondOrderF2(_alpha - u);
+    derivatives(2, 2) = secondOrderF2(u);
+    derivatives(2, 3) = secondOrderF3(u);
 
-    for (GLuint order = 0; order <= 1; ++order) {
+    for (GLuint order = 0; order <= max_order_of_derivatives; ++order) {
         for (GLuint i = 0; i < 4; ++i) {
             d[order] += _data[i] * derivatives(order, i);
         }
@@ -131,7 +135,47 @@ GLdouble SecondOrderHyperbolicArc::firstOrderF3(GLdouble t) const
 
     GLdouble halft   = t / 2;
     GLdouble shhalft = sinh(halft);
-    return 2 * cosh(halft) * c * shhalft * shhalft * shhalft;
+    return 2 * cosh(halft) * c * std::pow(shhalft, 3);
+}
+
+GLdouble SecondOrderHyperbolicArc::secondOrderF2(GLdouble t) const
+{
+    GLdouble halft   = t / 2;
+    GLdouble halfa   = _alpha / 2;
+    GLdouble csch4a2 = std::pow(1 / sinh(_alpha / 2), 4);
+    GLdouble halfamint  = halfa - halft;
+
+    return ((2 * std::pow(cosh(halfa), 2) + 1) *
+            csch4a2 *
+            ((std::pow(sinh(halfamint), 2)) *
+            (1/2 * std::pow(sinh(halft), 2) +
+             1/2 * std::pow(cosh(halft), 2)) +
+             std::pow(sinh(halft), 2) *
+             (std::pow(sinh(halft), 2)) *
+             (1/2 * std::pow(sinh(halfamint), 2) +
+              1/2 * std::pow(cosh(halfamint), 2)) -
+             2 * sinh(halft) * cosh(halft) *
+             sinh(halfamint) * cosh(halfamint)) +
+            4 * (cosh(halfa)/sinh(halfa)) *
+            std::pow(1/sinh(halfa), 3)*
+            (1/4 * std::pow(sinh(halft), 3) *
+             sinh(halfamint) +
+             sinh(halfamint)*
+             (3/4 * std::pow(sinh(halft), 3) +
+              3/2 * sinh(halft) *
+              std::pow(halft, 2)) -
+             3/2 * std::pow(sinh(halft), 2) *
+             cosh(halft) * cosh(halfamint)));
+}
+
+GLdouble SecondOrderHyperbolicArc::secondOrderF3(GLdouble t) const
+{
+    GLdouble halft   = t / 2;
+    GLdouble csch4a2 = std::pow(1 / sinh(_alpha / 2), 4);
+    GLdouble sinh2x3 = std::pow(sinh(halft), 3);
+    GLdouble sinh2x4 = sinh2x3 * sinh(halft);
+
+    return csch4a2 * (sinh2x4 + 3 * sinh2x3 * std::pow(cosh(halft), 2));
 }
 
 

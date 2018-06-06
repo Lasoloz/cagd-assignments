@@ -70,6 +70,7 @@ protected:
     GLboolean _renderControlPoints;
     GLboolean _renderControlPolygon;
     GLboolean _renderFirstOrderDerivatives;
+    GLboolean _renderSecondOrderDerivatives;
 
     TriangulatedMesh3 _sphere;
     GLdouble          _radius;
@@ -107,6 +108,7 @@ public:
     GLvoid    setRenderControlPolygon(GLboolean value);
     GLvoid    setRenderControlPoints(GLboolean value);
     GLvoid    setRenderFirstOrderDerivatives(GLboolean value);
+    GLvoid    setRenderSecondOrderDerivatives(GLboolean value);
     GLboolean setSelectedColor(GLfloat r, GLfloat g, GLfloat b,
                                GLfloat a = 1.0f);
     GLboolean setCurveColor(GLuint index, GLuint controlPoint, GLfloat r,

@@ -411,6 +411,12 @@ void GLWidget::set_firstOrderDerivative(bool value)
     updateGL();
 }
 
+void GLWidget::set_secondOrderDerivative(bool value)
+{
+    _comp_curve->setRenderSecondOrderDerivatives(value);
+    updateGL();
+}
+
 void GLWidget::set_control_points(bool value)
 {
     _comp_curve->setRenderControlPoints(value);
