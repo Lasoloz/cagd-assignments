@@ -205,8 +205,9 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         GLint viewport[4];
         glGetIntegerv(GL_VIEWPORT, viewport);
 
-        GLuint  size        = 4 * (4 * _comp_curve->getCurveCount() +
-                           16 * (GLuint)_comp_surface.getPatchCount());
+        GLuint curveControlPointCount   = 4 * _comp_curve->getCurveCount();
+        GLuint  size                    = 4 * (curveControlPointCount +
+                                          16 * (GLuint)_comp_surface.getPatchCount());
         GLuint *pick_buffer = new GLuint[size];
         glSelectBuffer(size, pick_buffer);
 
@@ -245,9 +246,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
         // render only the clickable geometries
         _comp_curve->renderClickable(true);
-        _comp_surface.renderSurface();
-        _comp_surface.renderWireframe();
-        _comp_surface.renderControlPoints(_control_point_mesh, true);
+        _comp_surface.renderControlPoints(_control_point_mesh, true, curveControlPointCount);
 
         glPopMatrix();
 
@@ -271,16 +270,15 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
                 }
             }
 
-            GLuint curveCount = _comp_curve->getCurveCount() * 4;
-            if (closest_selected < curveCount) {
+            if (closest_selected < curveControlPointCount) {
                 _primitiveIndex    = closest_selected / 4;
                 _controlPointIndex = closest_selected % 4;
                 _selection_type    = SelectionType::CURVE_POINT_SELECTED;
                 _comp_curve->setSelected(_primitiveIndex, _controlPointIndex,
                                          GL_TRUE);
             } else {
-                _primitiveIndex    = (closest_selected - curveCount) / 16;
-                _controlPointIndex = (closest_selected - curveCount) % 16;
+                _primitiveIndex    = (closest_selected - curveControlPointCount) / 16;
+                _controlPointIndex = (closest_selected - curveControlPointCount) % 16;
                 try {
                     _select_access = std::make_shared<CompositeSurfaceProvider>(
                         _comp_surface.getSelected(_primitiveIndex,
@@ -294,8 +292,6 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
                 }
             }
 
-            cout << "patch index: " << _primitiveIndex
-                 << "control point index: " << _controlPointIndex << endl;
             joinAndMergeHelper();
         } else {
             _join = _merge = GL_FALSE;

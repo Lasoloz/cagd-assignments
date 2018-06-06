@@ -52,7 +52,9 @@ public:
     void renderSurface(GLenum flag = GL_TRIANGLES);
     void renderWireframe(GLenum flag = GL_LINE_STRIP);
     void renderControlPoints(std::shared_ptr<TriangulatedMesh3> pointMesh,
-                             bool                               named) const;
+                             bool                               named,
+                             GLuint                             offset = 0
+                             ) const;
 
     CompositeSurfaceProvider getProvider(SurfaceId id);
     CompositeSurfaceProvider getSelected(GLuint selectedIndex,
