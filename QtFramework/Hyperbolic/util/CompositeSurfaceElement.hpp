@@ -99,6 +99,7 @@ public:
                              GLuint) const;
     void renderUVParametricLines() const;
     void renderNormals() const;
+    void renderTexture() const;
 
     // Utility methods:
     SecondOrderHyperbolicPatch *releaseOwnSurface();

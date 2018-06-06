@@ -27,7 +27,8 @@ GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     , _is_surface_shown(true)
     , _selection_type(SelectionType::NO_SELECTION)
     , _update_parametric_lines(false)
-    ,  _is_normals_shown(false)
+    , _is_normals_shown(false)
+    , _is_texture_shown(false)
 {
     _comp_curve = 0;
 
@@ -165,7 +166,10 @@ void GLWidget::paintGL()
         }
 
         if (_is_surface_shown) {
-            _comp_surface.renderSurface();
+            if (_is_texture_shown)
+                _comp_surface.renderTexture();
+            else
+                _comp_surface.renderSurface();
         }
 
         if (_update_parametric_lines) {
@@ -622,6 +626,52 @@ void GLWidget::set_isoparametric_lines_shown(bool value)
     updateGL();
 }
 
+void GLWidget::set_texture_shown(bool value)
+{
+    _is_texture_shown = value;
+    updateGL();
+}
+
+void GLWidget::load_texture()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+                            this,
+                            tr("Open"),
+                            "./Models/",
+                            "PNG File (*.png)");
+    initTexture(fileName);
+}
+
+GLvoid GLWidget::initTexture(QString filename) {
+    QImage img(filename);
+
+    const GLuint h = img.height();
+    const GLuint w = img.width();
+
+    const uchar *imgbits = img.bits();
+    uchar *newbits = new uchar[w * h * 4];
+
+    for (GLuint i = 0; i < w * h * 4; i += 4) {
+        newbits[i] = imgbits[i + 2];
+        newbits[i + 1] = imgbits[i + 1];
+        newbits[i + 2] = imgbits[i];
+        newbits[i + 3] = imgbits[i + 3];
+    }
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    glGenTextures(1, &_texName);
+    glBindTexture(GL_TEXTURE_2D, _texName);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, newbits);
+
+    delete[] newbits;
+}
+
 void GLWidget::insert_isolated_surface()
 {
     SecondOrderHyperbolicPatch *patch =
@@ -658,8 +708,7 @@ void GLWidget::save()
                         this,
                         tr("Save"),
                         "./Models/",
-                        "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
-    cout << fileName.toStdString() << endl;
+                        "AWFFTFP File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
 
     ofstream ofile(std::string(fileName.toStdString()));
     if (ofile.good()) {
@@ -673,8 +722,7 @@ void GLWidget::load()
                             this,
                             tr("Open"),
                             "./Models/",
-                            "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
-    cout << fileName.toStdString() << endl;
+                            "AWFFTFP File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
 
     fstream f(fileName.toStdString(), ios_base::in);
     if (f.good()) {

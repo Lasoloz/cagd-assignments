@@ -179,6 +179,12 @@ void SecondOrderHyperbolicCompositeSurface::renderNormals() const
     }
 }
 
+void SecondOrderHyperbolicCompositeSurface::renderTexture()
+{
+    for (auto &patch : _patches) {
+        patch.second.renderTexture();
+    }
+}
 
 CompositeSurfaceProvider SecondOrderHyperbolicCompositeSurface::getProvider(
     CompositeSurfaceElement::SurfaceId id)

@@ -105,6 +105,10 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(set_normals_shown(bool)));
     connect(_side_widget->showIsoparametric, SIGNAL(toggled(bool)), _gl_widget,
             SLOT(set_isoparametric_lines_shown(bool)));
+    connect(_side_widget->loadTextureButton, SIGNAL(pressed()), _gl_widget,
+            SLOT(load_texture()));
+    connect(_side_widget->enableTexture, SIGNAL(toggled(bool)), _gl_widget,
+            SLOT(set_texture_shown(bool)));
 
     connect(_side_widget->joinPatchButton, SIGNAL(pressed()), _gl_widget,
             SLOT(join()));

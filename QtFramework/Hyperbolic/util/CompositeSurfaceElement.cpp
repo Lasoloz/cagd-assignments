@@ -441,6 +441,20 @@ void CompositeSurfaceElement::renderNormals() const
     _surf_image->RenderNormals();
 }
 
+void CompositeSurfaceElement::renderTexture() const
+{
+    if (_shader) {
+        _shader->Disable();
+        glEnable(GL_TEXTURE_2D);
+        _surf_image->Render();
+        glDisable(GL_TEXTURE_2D);
+    } else {
+        glEnable(GL_TEXTURE_2D);
+        _surf_image->Render();
+        glDisable(GL_TEXTURE_2D);
+    }
+}
+
 void CompositeSurfaceElement::renderUVParametricLines() const
 {
     glColor3f(_wireframe_red_component, _wireframe_green_component,

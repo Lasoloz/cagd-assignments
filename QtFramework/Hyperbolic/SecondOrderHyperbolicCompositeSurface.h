@@ -62,6 +62,7 @@ public:
                              ) const;
     void renderUVParametricLines() const;
     void renderNormals() const;
+    void renderTexture();
 
     CompositeSurfaceProvider getProvider(CompositeSurfaceElement::SurfaceId id);
     CompositeSurfaceProvider getSelected(GLuint selectedIndex,

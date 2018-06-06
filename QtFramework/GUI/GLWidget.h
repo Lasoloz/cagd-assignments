@@ -76,6 +76,7 @@ private:
     bool _is_surface_shown;
     bool _update_parametric_lines;
     bool _is_normals_shown;
+    bool _is_texture_shown;
 
 
     // On-screen events:
@@ -94,6 +95,8 @@ private:
     GLint     _arc1[2];
     GLint     _arc2[2];
 
+    GLuint _texName;
+
 
 public:
     // special and default constructor
@@ -106,6 +109,8 @@ public:
     void initializeGL();
     void paintGL();
     void resizeGL(int w, int h);
+
+    GLvoid initTexture(QString fileName);
 
     void mousePressEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
@@ -149,6 +154,9 @@ public slots:
     void set_patch_image_shown(bool value);
     void set_normals_shown(bool value);
     void set_isoparametric_lines_shown(bool value);
+    void set_texture_shown(bool value);
+
+    void load_texture();
 
     void insert_isolated_surface();
 

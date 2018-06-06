@@ -415,7 +415,7 @@
        <x>0</x>
        <y>0</y>
        <width>281</width>
-       <height>171</height>
+       <height>201</height>
       </rect>
      </property>
      <property name="title">
@@ -548,7 +548,7 @@
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>120</y>
+        <y>140</y>
         <width>131</width>
         <height>17</height>
        </rect>
@@ -574,6 +574,32 @@
       </property>
       <property name="checked">
        <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="enableTexture">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>120</y>
+        <width>70</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Texture</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="loadTextureButton">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>170</y>
+        <width>101</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Load texture</string>
       </property>
      </widget>
     </widget>
