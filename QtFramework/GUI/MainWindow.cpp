@@ -110,6 +110,21 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(join()));
     connect(_side_widget->mergePatchButton, SIGNAL(pressed()), _gl_widget,
             SLOT(merge()));
+
+    connect(_side_widget->continuePatchButton, SIGNAL(pressed()), _gl_widget,
+            SLOT(continue_patch()));
+
+    connect(_side_widget->shadersComboBox, SIGNAL(activated(QString)),
+            _gl_widget, SLOT(set_shader(QString)));
+
+    connect(_side_widget->scaleFactorSpinBox, SIGNAL(valueChanged(double)),
+            _gl_widget, SLOT(set_scale_factor(double)));
+    connect(_side_widget->smoothingSpinBox, SIGNAL(valueChanged(double)),
+            _gl_widget, SLOT(set_smoothing(double)));
+    connect(_side_widget->shadingSpinBox, SIGNAL(valueChanged(double)),
+            _gl_widget, SLOT(set_shading(double)));
+    connect(_side_widget->colorPickerButton, SIGNAL(pressed()), _gl_widget,
+            SLOT(set_color()));
 }
 
 //--------------------------------

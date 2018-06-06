@@ -248,6 +248,8 @@ void CompositeSurfaceElement::joinWith(Direction                direction,
 
             secondPatch->SetData(x2o, y2o, pOther);
         });
+
+    neighbor->_update_needed = true;
 }
 
 void CompositeSurfaceElement::splitFrom(Direction direction)
@@ -322,8 +324,9 @@ void CompositeSurfaceElement::mergeWith(Direction                direction,
 
 // Continue:
 // =========
-void CompositeSurfaceElement::continuePatch(CompositeSurfaceElement *patch,
-                                            Direction                direction)
+void CompositeSurfaceElement::continuePatch(CompositeSurfaceElement *neighbor,
+                                            Direction                direction,
+                                            Direction otherDirection)
 {
     splitFrom(direction);
 
@@ -447,12 +450,13 @@ bool CompositeSurfaceElement::updateVBOs(GLuint divU, GLuint divV,
 
 void CompositeSurfaceElement::renderMesh(GLenum flag)
 {
-    _material.Apply();
     if (_shader) {
-        _shader->Enable();
+        _shader->Enable();;
+        _material.Apply();
         _surf_image->Render(flag);
         _shader->Disable();
     } else {
+        _material.Apply();
         _surf_image->Render(flag);
     }
 }

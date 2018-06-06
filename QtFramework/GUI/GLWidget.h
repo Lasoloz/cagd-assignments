@@ -1,11 +1,11 @@
 #pragma once
 
-#include <GL/glew.h>
+#include <Core/GenericCurves3.h>
 #include <Core/Lights.h>
 #include <Core/Materials.h>
-#include <Core/GenericCurves3.h>
 #include <Core/ShaderPrograms.h>
 #include <Core/TriangulatedMeshes3.h>
+#include <GL/glew.h>
 #include <Hyperbolic/SecondOrderHyperbolicArc.h>
 #include <Hyperbolic/SecondOrderHyperbolicCompositeCurve.h>
 #include <Hyperbolic/SecondOrderHyperbolicCompositeSurface.h>
@@ -15,9 +15,9 @@
 #include <Test/TestFunctions.h>
 #include <util/util.hpp>
 
-#include <QTimer>
 #include <QGLFormat>
 #include <QGLWidget>
+#include <QTimer>
 #include <QWheelEvent>
 
 #include <memory>
@@ -149,6 +149,14 @@ public slots:
     void set_patch_image_shown(bool value);
     void set_normals_shown(bool value);
     void set_isoparametric_lines_shown(bool value);
+
+    void set_shader(QString shader_name);
+    void set_scale_factor(double scaleFloat);
+    void set_smoothing(double smoothing);
+    void set_shading(double shading);
+    void set_color();
+
+    void continue_patch();
 
     void insert_isolated_surface();
 

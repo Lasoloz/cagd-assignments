@@ -37,9 +37,9 @@ public:
                             GLuint, GLuint, GLuint, GLuint);
 
 
-private:
     static double default_tension;
 
+private:
     unsigned _use_count;
 
     std::array<CompositeSurfaceElement *, DIR_COUNT> _neighbors;
@@ -83,7 +83,7 @@ public:
     void mergeWith(Direction, Direction, CompositeSurfaceElement *);
 
     // Continue:
-    void continuePatch(CompositeSurfaceElement *, Direction);
+    void continuePatch(CompositeSurfaceElement *, Direction, Direction);
 
     // Both:
     void forceConditions();

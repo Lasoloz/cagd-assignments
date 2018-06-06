@@ -5,8 +5,8 @@
 #include <Core/Exceptions.h>
 #include <GL/glu.h>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 
 using namespace std;
@@ -25,9 +25,9 @@ GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     , _is_wireframe_shown(false)
     , _is_control_points_shown(false)
     , _is_surface_shown(true)
-    , _selection_type(SelectionType::NO_SELECTION)
     , _update_parametric_lines(false)
-    ,  _is_normals_shown(false)
+    , _is_normals_shown(false)
+    , _selection_type(SelectionType::NO_SELECTION)
 {
     _comp_curve = 0;
 
@@ -122,9 +122,29 @@ void GLWidget::initializeGL()
         // objects
         // ...
         _two_sided_light = std::make_shared<ShaderProgram>();
-        _two_sided_light->InstallShaders("Shaders/two_sided_lighting.vert",
-                                         "Shaders/two_sided_lighting.frag",
-                                         GL_TRUE);
+        if (!_two_sided_light->InstallShaders("Shaders/two_sided_lighting.vert",
+                                              "Shaders/two_sided_lighting.frag",
+                                              GL_TRUE)) {
+            std::cerr << "Failed to install two sided lighting!\n";
+        }
+        _directional_light = std::make_shared<ShaderProgram>();
+        if (!_directional_light->InstallShaders(
+                "Shaders/directional_light.vert",
+                "Shaders/directional_light.frag", GL_TRUE)) {
+            std::cerr << "Failed to install directional light!\n";
+        }
+        _reflection_lines = std::make_shared<ShaderProgram>();
+        if (!_reflection_lines->InstallShaders("Shaders/reflection_lines.vert",
+                                               "Shaders/reflection_lines.frag",
+                                               GL_TRUE)) {
+            std::cerr << "Failed to install reflection lines!\n";
+        }
+        _toon = std::make_shared<ShaderProgram>();
+        if (!_toon->InstallShaders("Shaders/toon.vert", "Shaders/toon.frag",
+                                   GL_TRUE)) {
+            std::cerr << "Failed to install toon!\n";
+        }
+
         _comp_curve = new (nothrow) SecondOrderHyperbolicCompositeCurve(10);
 
         _control_point_mesh = std::make_shared<TriangulatedMesh3>();
@@ -219,10 +239,10 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         GLint viewport[4];
         glGetIntegerv(GL_VIEWPORT, viewport);
 
-        GLuint curveControlPointCount   = 4 * _comp_curve->getCurveCount();
-        GLuint  size                    = 4 * (curveControlPointCount +
-                                          16 * (GLuint)_comp_surface.getPatchCount());
-        GLuint *pick_buffer = new GLuint[size];
+        GLuint  curveControlPointCount = 4 * _comp_curve->getCurveCount();
+        GLuint  size                   = 4 * (curveControlPointCount +
+                           16 * (GLuint)_comp_surface.getPatchCount());
+        GLuint *pick_buffer            = new GLuint[size];
         glSelectBuffer(size, pick_buffer);
 
         glRenderMode(GL_SELECT);
@@ -260,7 +280,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
         // render only the clickable geometries
         _comp_curve->renderClickable(true);
-        _comp_surface.renderControlPoints(_control_point_mesh, true, curveControlPointCount);
+        _comp_surface.renderControlPoints(_control_point_mesh, true,
+                                          curveControlPointCount);
 
         glPopMatrix();
 
@@ -291,8 +312,10 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
                 _comp_curve->setSelected(_primitiveIndex, _controlPointIndex,
                                          GL_TRUE);
             } else {
-                _primitiveIndex    = (closest_selected - curveControlPointCount) / 16;
-                _controlPointIndex = (closest_selected - curveControlPointCount) % 16;
+                _primitiveIndex =
+                    (closest_selected - curveControlPointCount) / 16;
+                _controlPointIndex =
+                    (closest_selected - curveControlPointCount) % 16;
                 try {
                     _last_access   = _select_access;
                     _select_access = std::make_shared<CompositeSurfaceProvider>(
@@ -618,9 +641,87 @@ void GLWidget::set_normals_shown(bool value)
 void GLWidget::set_isoparametric_lines_shown(bool value)
 {
     _update_parametric_lines = value;
-    _is_surface_shown = _comp_surface.updateVBOs(100, 100, _update_parametric_lines);
+    _is_surface_shown =
+        _comp_surface.updateVBOs(100, 100, _update_parametric_lines);
     updateGL();
 }
+
+void GLWidget::set_shader(QString shader_name)
+{
+    if (_select_access) {
+        const std::string shaderNameStr = shader_name.toStdString();
+
+        if (shaderNameStr == "Directional light") {
+            _select_access->setShader(_directional_light);
+        } else if (shaderNameStr == "Two sided lighting") {
+            _select_access->setShader(_two_sided_light);
+        } else if (shaderNameStr == "Reflection lines") {
+            _select_access->setShader(_reflection_lines);
+        } else if (shaderNameStr == "Toon") {
+            _select_access->setShader(_toon);
+        }
+    }
+
+    updateGL();
+}
+
+
+void GLWidget::set_scale_factor(double scaleFloat)
+{
+    _reflection_lines->Enable(false);
+    _reflection_lines->SetUniformVariable1f("scale_factor", scaleFloat);
+    _reflection_lines->Disable();
+    updateGL();
+}
+
+void GLWidget::set_smoothing(double smoothing)
+{
+    _reflection_lines->Enable(false);
+    _reflection_lines->SetUniformVariable1f("smoothing", smoothing);
+    _reflection_lines->Disable();
+    updateGL();
+}
+
+void GLWidget::set_shading(double shading)
+{
+    _reflection_lines->Enable(false);
+    _reflection_lines->SetUniformVariable1f("shading", shading);
+    _reflection_lines->Disable();
+    updateGL();
+}
+
+void GLWidget::set_color()
+{
+    QColor color = QColorDialog::getColor(Qt::red, this);
+
+    if (color.isValid()) {
+        _toon->Enable(false);
+        _toon->SetUniformVariable4f("default_outline_color", color.redF(),
+                                    color.greenF(), color.blueF(),
+                                    color.alphaF());
+        _toon->Disable();
+        updateGL();
+    }
+}
+
+
+void GLWidget::continue_patch()
+{
+    if (_select_access) {
+        CompositeSurfaceElement::SurfaceId id  = _select_access->getId();
+        CompositeSurfaceElement::Direction dir = _select_access->getDirection();
+
+        try {
+            _comp_surface.continuePatch(id, dir);
+            _is_surface_shown =
+                _comp_surface.updateVBOs(100, 100, _update_parametric_lines);
+            updateGL();
+        } catch (Exception ex) {
+            std::cerr << "Failed to continue patch: " << ex << '\n';
+        }
+    }
+}
+
 
 void GLWidget::insert_isolated_surface()
 {
@@ -655,10 +756,8 @@ void GLWidget::insert_isolated_surface()
 void GLWidget::save()
 {
     QString fileName = QFileDialog::getSaveFileName(
-                        this,
-                        tr("Save"),
-                        "./Models/",
-                        "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
+        this, tr("Save"), "./Models/",
+        "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
     cout << fileName.toStdString() << endl;
 
     ofstream ofile(std::string(fileName.toStdString()));
@@ -670,10 +769,8 @@ void GLWidget::save()
 void GLWidget::load()
 {
     QString fileName = QFileDialog::getOpenFileName(
-                            this,
-                            tr("Open"),
-                            "./Models/",
-                            "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
+        this, tr("Open"), "./Models/",
+        "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
     cout << fileName.toStdString() << endl;
 
     fstream f(fileName.toStdString(), ios_base::in);

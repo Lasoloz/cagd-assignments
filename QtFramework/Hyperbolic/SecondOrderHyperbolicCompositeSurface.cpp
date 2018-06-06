@@ -86,7 +86,20 @@ void SecondOrderHyperbolicCompositeSurface::continuePatch(
     SecondOrderHyperbolicPatch *patch = new SecondOrderHyperbolicPatch(
         CompositeSurfaceElement::default_tension);
 
-    _patches.at(which).continuePatch(patch, direction);
+    CompositeSurfaceElement::SurfaceId id = add(patch);
+
+    CompositeSurfaceElement &pElem = _patches.at(id);
+
+    if (direction % 2) {
+        _patches.at(which).continuePatch(&pElem, direction,
+                                         CompositeSurfaceElement::NORTH_EAST);
+    } else {
+        _patches.at(which).continuePatch(&pElem, direction,
+                                         CompositeSurfaceElement::NORTH);
+    }
+
+    auto access = getProvider(id);
+    access.setMaterial(MatFBGold);
 }
 
 
@@ -160,7 +173,8 @@ void SecondOrderHyperbolicCompositeSurface::renderWireframe(GLenum flag)
 }
 
 void SecondOrderHyperbolicCompositeSurface::renderControlPoints(
-    std::shared_ptr<TriangulatedMesh3> pointMesh, bool named, GLuint startCount) const
+    std::shared_ptr<TriangulatedMesh3> pointMesh, bool named,
+    GLuint startCount) const
 {
     if (named) {
         for (auto &patch : _patches) {
