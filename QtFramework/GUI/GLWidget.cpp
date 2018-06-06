@@ -497,8 +497,7 @@ void GLWidget::save()
                         this,
                         tr("Save"),
                         "./Models/",
-                        "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
-    cout << fileName.toStdString() << endl;
+                        "OAFFTFP File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
 
     ofstream ofile(std::string(fileName.toStdString()));
     if (ofile.good()) {
@@ -512,8 +511,7 @@ void GLWidget::load()
                             this,
                             tr("Open"),
                             "./Models/",
-                            "OFF File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
-    cout << fileName.toStdString() << endl;
+                            "OAFFTFP File (*.OUR_AWESOME_FORMAT_FOR_THE_FUCKING_PROJECT)");
 
     fstream f(fileName.toStdString(), ios_base::in);
     if (f.good()) {
