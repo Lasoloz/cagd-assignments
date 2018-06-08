@@ -13,6 +13,7 @@
 #include <Parametric/ParametricCurves3.h>
 #include <Parametric/ParametricSurfaces3.h>
 #include <Test/TestFunctions.h>
+#include <Core/Lights.h>
 #include <util/util.hpp>
 
 #include <QGLFormat>
@@ -55,6 +56,15 @@ private:
     std::shared_ptr<ShaderProgram> _toon;
     std::shared_ptr<ShaderProgram> _reflection_lines;
 
+    // Lights
+    DirectionalLight* _directional;
+    Spotlight* _spotlight;
+    PointLight* _pointLight;
+
+    bool _dirLight_enabled;
+    bool _spotlight_enabled;
+    bool _pointlight_enabled;
+
     // Control point mesh:
     std::shared_ptr<TriangulatedMesh3> _control_point_mesh;
 
@@ -75,6 +85,7 @@ private:
     bool _is_control_points_shown;
     bool _is_surface_shown;
     bool _update_parametric_lines;
+    bool _uv_derivatives_shown;
     bool _is_normals_shown;
     bool _is_texture_shown;
 
@@ -145,6 +156,10 @@ public slots:
     void change_selected_color();
     void change_selected_arcs_color();
 
+    void set_directional_light(bool value);
+    void set_point_light(bool value);
+    void set_spotlight(bool value);
+
     void join();
     void merge();
 
@@ -154,6 +169,7 @@ public slots:
     void set_patch_image_shown(bool value);
     void set_normals_shown(bool value);
     void set_isoparametric_lines_shown(bool value);
+    void set_uv_derivatives_shown(bool value);
     void set_texture_shown(bool value);
 
     void load_texture();

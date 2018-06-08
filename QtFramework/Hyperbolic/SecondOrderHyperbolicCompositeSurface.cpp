@@ -189,10 +189,10 @@ void SecondOrderHyperbolicCompositeSurface::renderControlPoints(
     }
 }
 
-void SecondOrderHyperbolicCompositeSurface::renderUVParametricLines() const
+void SecondOrderHyperbolicCompositeSurface::renderUVParametricLines(GLboolean showDerivatives) const
 {
     for (auto &patch : _patches) {
-        patch.second.renderUVParametricLines();
+        patch.second.renderUVParametricLines(showDerivatives);
     }
 }
 

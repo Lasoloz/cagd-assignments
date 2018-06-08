@@ -66,6 +66,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(_side_widget->loadButton, SIGNAL(pressed()), _gl_widget,
             SLOT(load()));
 
+    connect(_side_widget->dirLight, SIGNAL(toggled(bool)), _gl_widget,
+            SLOT(set_directional_light(bool)));
+    connect(_side_widget->pointLight, SIGNAL(toggled(bool)), _gl_widget,
+            SLOT(set_point_light(bool)));
+    connect(_side_widget->spotLight, SIGNAL(toggled(bool)), _gl_widget,
+            SLOT(set_spotlight(bool)));
+
     // Curve:
     connect(_side_widget->secondOrderDerivatives, SIGNAL(toggled(bool)),
             _gl_widget, SLOT(set_secondOrderDerivative(bool)));
@@ -105,6 +112,8 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(set_normals_shown(bool)));
     connect(_side_widget->showIsoparametric, SIGNAL(toggled(bool)), _gl_widget,
             SLOT(set_isoparametric_lines_shown(bool)));
+    connect(_side_widget->uvDerivativesPatch, SIGNAL(toggled(bool)), _gl_widget,
+            SLOT(set_uv_derivatives_shown(bool)));
     connect(_side_widget->loadTextureButton, SIGNAL(pressed()), _gl_widget,
             SLOT(load_texture()));
     connect(_side_widget->enableTexture, SIGNAL(toggled(bool)), _gl_widget,

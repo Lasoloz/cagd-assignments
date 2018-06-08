@@ -21,11 +21,18 @@ GLWidget::GLWidget(QWidget *parent, const QGLFormat &format)
     , _cursor_x(0.0)
     , _cursor_y(0.0)
     , _cursor_z(0.0)
+    , _directional(nullptr)
+    , _spotlight(nullptr)
+    , _pointLight(nullptr)
+    , _dirLight_enabled(true)
+    , _spotlight_enabled(false)
+    , _pointlight_enabled(false)
     , _is_patch_vbo_updated(false)
     , _is_wireframe_shown(false)
     , _is_control_points_shown(false)
     , _is_surface_shown(true)
     , _update_parametric_lines(false)
+    , _uv_derivatives_shown(false)
     , _is_normals_shown(false)
     , _is_texture_shown(false)
     , _selection_type(SelectionType::NO_SELECTION)
@@ -50,6 +57,21 @@ void GLWidget::releaseResources()
     if (_comp_curve) {
         delete _comp_curve;
         _comp_curve = 0;
+    }
+
+    if (_directional) {
+        delete _directional;
+        _directional = nullptr;
+    }
+
+    if (_spotlight) {
+        delete _spotlight;
+        _directional = nullptr;
+    }
+
+    if (_pointLight) {
+        delete _pointLight;
+        _pointLight = nullptr;
     }
 }
 
@@ -146,6 +168,21 @@ void GLWidget::initializeGL()
             std::cerr << "Failed to install toon!\n";
         }
 
+        HCoordinate3 direction(0.0, 0.0, 1.0, 1.0);
+        Color4 ambient (0.4, 0.4, 0.4, 1.0);
+        Color4 diffuse (0.8, 0.8, 0.8, 1.0);
+        Color4 specular (1.0, 1.0, 1.0, 1.0);
+
+        GLfloat constant_attenuation = 0.5f;
+        GLfloat linear_attenuation= 0.5f;
+        GLfloat quadratic_attenuation = 0.5f;
+
+        _directional = new DirectionalLight(GL_LIGHT0, direction, ambient, diffuse, specular);
+        _spotlight = new Spotlight(GL_LIGHT1, direction, ambient, diffuse, specular, constant_attenuation
+                                   , linear_attenuation, quadratic_attenuation, direction, 0.5f, 0.5f);
+        _pointLight = new PointLight(GL_LIGHT2, direction, ambient, diffuse, specular,
+                                     constant_attenuation, linear_attenuation, quadratic_attenuation);
+
         _comp_curve = new (nothrow) SecondOrderHyperbolicCompositeCurve(10);
 
         _control_point_mesh = std::make_shared<TriangulatedMesh3>();
@@ -182,18 +219,44 @@ void GLWidget::paintGL()
 
     if (_is_patch_vbo_updated) {
         if (_is_wireframe_shown) {
+
+
             _comp_surface.renderWireframe();
+
+
+
         }
 
         if (_is_surface_shown) {
             if (_is_texture_shown)
                 _comp_surface.renderTexture();
-            else
+            else {
+                if (_dirLight_enabled) {
+                    _directional->Enable();
+                }
+                if(_spotlight_enabled) {
+                    _spotlight->Enable();
+                }
+                if (_pointlight_enabled) {
+                    _pointLight->Enable();
+                }
+
                 _comp_surface.renderSurface();
+
+                if (_dirLight_enabled) {
+                    _directional->Disable();
+                }
+                if(_spotlight_enabled) {
+                    _spotlight->Disable();
+                }
+                if (_pointlight_enabled) {
+                    _pointLight->Disable();
+                }
+            }
         }
 
         if (_update_parametric_lines) {
-            _comp_surface.renderUVParametricLines();
+            _comp_surface.renderUVParametricLines(_uv_derivatives_shown);
         }
 
         if (_is_normals_shown) {
@@ -650,6 +713,12 @@ void GLWidget::set_isoparametric_lines_shown(bool value)
     updateGL();
 }
 
+void GLWidget::set_uv_derivatives_shown(bool value)
+{
+    _uv_derivatives_shown = value;
+    updateGL();
+}
+
 void GLWidget::set_shader(QString shader_name)
 {
     if (_select_access) {
@@ -752,6 +821,24 @@ void GLWidget::set_color()
         _toon->Disable();
         updateGL();
     }
+}
+
+void GLWidget::set_directional_light(bool value)
+{
+    _dirLight_enabled = value;
+    updateGL();
+}
+
+void GLWidget::set_point_light(bool value)
+{
+    _pointlight_enabled = value;
+    updateGL();
+}
+
+void GLWidget::set_spotlight(bool value)
+{
+    _spotlight_enabled = value;
+    updateGL();
 }
 
 

@@ -507,13 +507,19 @@ void CompositeSurfaceElement::renderTexture() const
     }
 }
 
-void CompositeSurfaceElement::renderUVParametricLines() const
+void CompositeSurfaceElement::renderUVParametricLines(GLboolean showDerivatives) const
 {
     glColor3f(_wireframe_red_component, _wireframe_green_component,
               _wireframe_blue_component);
     for (int i = 0; i < _u_parametric_lines.size(); ++i) {
         _u_parametric_lines[i]->RenderDerivatives(0, GL_LINE_STRIP);
         _v_parametric_lines[i]->RenderDerivatives(0, GL_LINE_STRIP);
+        if (showDerivatives) {
+            glColor3f(1.0f, 0.5f, 0.7f);
+            _u_parametric_lines[i]->RenderDerivatives(1, GL_LINES);
+            glColor3f(0.5f, 1.0f, 0.7f);
+            _v_parametric_lines[i]->RenderDerivatives(1, GL_LINES);
+        }
     }
 }
 

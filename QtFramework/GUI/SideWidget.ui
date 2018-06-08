@@ -233,7 +233,7 @@
     <bool>false</bool>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="curvesPage">
     <property name="geometry">
@@ -241,7 +241,7 @@
       <x>0</x>
       <y>0</y>
       <width>281</width>
-      <height>200</height>
+      <height>173</height>
      </rect>
     </property>
     <attribute name="label">
@@ -403,7 +403,7 @@
       <x>0</x>
       <y>0</y>
       <width>281</width>
-      <height>200</height>
+      <height>173</height>
      </rect>
     </property>
     <attribute name="label">
@@ -486,17 +486,17 @@
        <string>Remove</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="firstOrderDerivativesPatch">
+     <widget class="QCheckBox" name="uvDerivativesPatch">
       <property name="geometry">
        <rect>
         <x>130</x>
         <y>20</y>
-        <width>131</width>
+        <width>151</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
-       <string>First order derivatives</string>
+       <string>U-V first order derivatives</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="showNormals">
@@ -610,7 +610,7 @@
       <x>0</x>
       <y>0</y>
       <width>281</width>
-      <height>200</height>
+      <height>173</height>
      </rect>
     </property>
     <attribute name="label">
@@ -784,6 +784,66 @@
       </property>
       <property name="singleStep">
        <double>0.010000000000000</double>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="page">
+    <attribute name="label">
+     <string>Lights</string>
+    </attribute>
+    <widget class="QGroupBox" name="groupBox_5">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>281</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Lights</string>
+     </property>
+     <widget class="QCheckBox" name="dirLight">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>20</y>
+        <width>151</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Directional Light</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="pointLight">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>40</y>
+        <width>171</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Point Light</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="spotLight">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>60</y>
+        <width>70</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Spotlight</string>
       </property>
      </widget>
     </widget>

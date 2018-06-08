@@ -100,7 +100,7 @@ public:
     void renderControlPoints(std::shared_ptr<TriangulatedMesh3> &) const;
     void renderControlPoints(std::shared_ptr<TriangulatedMesh3> &,
                              GLuint) const;
-    void renderUVParametricLines() const;
+    void renderUVParametricLines(GLboolean showDerivatives) const;
     void renderNormals() const;
     void renderTexture() const;
 

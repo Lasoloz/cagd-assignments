@@ -63,7 +63,7 @@ public:
                              bool                               named,
                              GLuint                             offset = 0
                              ) const;
-    void renderUVParametricLines() const;
+    void renderUVParametricLines(GLboolean showDerivatives) const;
     void renderNormals() const;
     void renderTexture();
 
