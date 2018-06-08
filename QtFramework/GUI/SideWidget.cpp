@@ -18,9 +18,9 @@ namespace cagd
 
         rotate_y_slider->setPalette(p);
 
-        shadersComboBox->addItem("Two sided light");
+        shadersComboBox->addItem("Two sided lighting");
         shadersComboBox->addItem("Directional light");
-        shadersComboBox->addItem("Reflection light");
+        shadersComboBox->addItem("Reflection lines");
         shadersComboBox->addItem("Toon");
     }
 }

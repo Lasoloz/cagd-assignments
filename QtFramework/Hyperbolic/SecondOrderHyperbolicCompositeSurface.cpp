@@ -79,6 +79,29 @@ void SecondOrderHyperbolicCompositeSurface::joinToFirst(
         .joinWith(directionA, directionB, &_patches.at(surfaceIdB));
 }
 
+void SecondOrderHyperbolicCompositeSurface::continuePatch(
+    CompositeSurfaceElement::SurfaceId which,
+    CompositeSurfaceElement::Direction direction)
+{
+    SecondOrderHyperbolicPatch *patch = new SecondOrderHyperbolicPatch(
+        CompositeSurfaceElement::default_tension);
+
+    CompositeSurfaceElement::SurfaceId id = add(patch);
+
+    CompositeSurfaceElement &pElem = _patches.at(id);
+
+    if (direction % 2) {
+        _patches.at(which).continuePatch(&pElem, direction,
+                                         CompositeSurfaceElement::NORTH_EAST);
+    } else {
+        _patches.at(which).continuePatch(&pElem, direction,
+                                         CompositeSurfaceElement::NORTH);
+    }
+
+    auto access = getProvider(id);
+    access.setMaterial(MatFBGold);
+}
+
 
 bool SecondOrderHyperbolicCompositeSurface::areJoined(
     CompositeSurfaceElement::SurfaceId surfaceIdA,
@@ -150,7 +173,8 @@ void SecondOrderHyperbolicCompositeSurface::renderWireframe(GLenum flag)
 }
 
 void SecondOrderHyperbolicCompositeSurface::renderControlPoints(
-    std::shared_ptr<TriangulatedMesh3> pointMesh, bool named, GLuint startCount) const
+    std::shared_ptr<TriangulatedMesh3> pointMesh, bool named,
+    GLuint startCount) const
 {
     if (named) {
         for (auto &patch : _patches) {

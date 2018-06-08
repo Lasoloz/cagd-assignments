@@ -42,6 +42,9 @@ public:
                      CompositeSurfaceElement::Direction directionA,
                      CompositeSurfaceElement::Direction directionB);
 
+    void continuePatch(CompositeSurfaceElement::SurfaceId which,
+                       CompositeSurfaceElement::Direction direction);
+
     bool areJoined(CompositeSurfaceElement::SurfaceId surfaceIdA,
                    CompositeSurfaceElement::SurfaceId surfaceIdB,
                    CompositeSurfaceElement::Direction directionA) const;
